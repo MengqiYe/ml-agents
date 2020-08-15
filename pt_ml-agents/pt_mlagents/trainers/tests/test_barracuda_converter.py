@@ -5,7 +5,7 @@ import pytest
 import pt_mlagents.trainers.tensorflow_to_barracuda as tf2bc
 from pt_mlagents.trainers.tests.test_nn_policy import create_policy_mock
 from pt_mlagents.trainers.settings import TrainerSettings
-from pt_mlagents.tf_utils import tf
+from pt_mlagents.pt_utils import pt
 from pt_mlagents.model_serialization import SerializationSettings, export_policy_model
 
 

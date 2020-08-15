@@ -8,7 +8,7 @@ import numpy as np
 from pt_mlagents_envs.logging_util import get_logger
 from pt_mlagents_envs.base_env import BehaviorSpec
 from pt_mlagents.trainers.policy import Policy
-from pt_mlagents.trainers.policy.tf_policy import TFPolicy
+from pt_mlagents.trainers.policy.pt_policy import PTPolicy
 
 from pt_mlagents.trainers.trainer import Trainer
 from pt_mlagents.trainers.trajectory import Trajectory
@@ -117,7 +117,7 @@ class GhostTrainer(Trainer):
         self.current_policy_snapshot: Dict[str, List[float]] = {}
 
         self.snapshot_counter: int = 0
-        self.policies: Dict[str, TFPolicy] = {}
+        self.policies: Dict[str, PTPolicy] = {}
 
         # wrapped_training_team and learning team need to be separate
         # in the situation where new agents are created destroyed
@@ -262,7 +262,7 @@ class GhostTrainer(Trainer):
         for brain_name in self._internal_policy_queues:
             internal_policy_queue = self._internal_policy_queues[brain_name]
             try:
-                policy = cast(TFPolicy, internal_policy_queue.get_nowait())
+                policy = cast(PTPolicy, internal_policy_queue.get_nowait())
                 self.current_policy_snapshot[brain_name] = policy.get_weights()
             except AgentManagerQueue.Empty:
                 pass
@@ -316,7 +316,7 @@ class GhostTrainer(Trainer):
 
     def create_policy(
         self, parsed_behavior_id: BehaviorIdentifiers, behavior_spec: BehaviorSpec
-    ) -> TFPolicy:
+    ) -> PTPolicy:
         """
         Creates policy with the wrapped trainer's create_policy function
         The first policy encountered sets the wrapped
@@ -325,7 +325,7 @@ class GhostTrainer(Trainer):
         wrapped trainer to be trained.
         """
         policy = self.trainer.create_policy(parsed_behavior_id, behavior_spec)
-        policy.create_tf_graph()
+        policy.create_pt_graph()
         policy.initialize_or_load()
         policy.init_load_weights()
         team_id = parsed_behavior_id.team_id
@@ -349,7 +349,7 @@ class GhostTrainer(Trainer):
         return policy
 
     def add_policy(
-        self, parsed_behavior_id: BehaviorIdentifiers, policy: TFPolicy
+        self, parsed_behavior_id: BehaviorIdentifiers, policy: PTPolicy
     ) -> None:
         """
         Adds policy to GhostTrainer.
@@ -360,7 +360,7 @@ class GhostTrainer(Trainer):
         self._name_to_parsed_behavior_id[name_behavior_id] = parsed_behavior_id
         self.policies[name_behavior_id] = policy
 
-    def get_policy(self, name_behavior_id: str) -> TFPolicy:
+    def get_policy(self, name_behavior_id: str) -> PTPolicy:
         """
         Gets policy associated with name_behavior_id
         :param name_behavior_id: Fully qualified behavior name

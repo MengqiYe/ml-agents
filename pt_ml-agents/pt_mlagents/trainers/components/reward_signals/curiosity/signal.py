@@ -1,16 +1,16 @@
 from typing import Any, Dict
 import numpy as np
-from pt_mlagents.tf_utils import tf
+from pt_mlagents.pt_utils import pt
 
 from pt_mlagents.trainers.components.reward_signals import RewardSignal, RewardSignalResult
 from pt_mlagents.trainers.components.reward_signals.curiosity.model import CuriosityModel
-from pt_mlagents.trainers.policy.tf_policy import TFPolicy
+from pt_mlagents.trainers.policy.pt_policy import PTPolicy
 from pt_mlagents.trainers.buffer import AgentBuffer
 from pt_mlagents.trainers.settings import CuriositySettings
 
 
 class CuriosityRewardSignal(RewardSignal):
-    def __init__(self, policy: TFPolicy, settings: CuriositySettings):
+    def __init__(self, policy: PTPolicy, settings: CuriositySettings):
         """
         Creates the Curiosity reward generator
         :param policy: The Learning Policy
@@ -63,7 +63,7 @@ class CuriosityRewardSignal(RewardSignal):
         return RewardSignalResult(scaled_reward, unscaled_reward)
 
     def prepare_update(
-        self, policy: TFPolicy, mini_batch: AgentBuffer, num_sequences: int
+        self, policy: PTPolicy, mini_batch: AgentBuffer, num_sequences: int
     ) -> Dict[pt.Tensor, Any]:
         """
         Prepare for update and get feed_dict.

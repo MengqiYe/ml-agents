@@ -8,7 +8,7 @@ from typing import Dict, Set, List
 from collections import defaultdict
 
 import numpy as np
-from pt_mlagents.tf_utils import tf
+from pt_mlagents.pt_utils import pt
 
 from pt_mlagents_envs.logging_util import get_logger
 from pt_mlagents.trainers.env_manager import EnvManager

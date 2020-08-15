@@ -5,7 +5,7 @@ import json
 import attr
 import cattr
 
-from pt_mlagents.tf_utils import tf
+from pt_mlagents.pt_utils import pt
 from pt_mlagents_envs.logging_util import get_logger
 from pt_mlagents.trainers import __version__
 from pt_mlagents.trainers.exception import TrainerError

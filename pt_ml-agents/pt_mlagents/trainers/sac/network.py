@@ -1,5 +1,5 @@
 from typing import Dict, Optional
-from pt_mlagents.tf_utils import tf
+from pt_mlagents.pt_utils import pt
 from pt_mlagents.trainers.models import ModelUtils, EncoderType
 
 LOG_STD_MAX = 2
@@ -190,7 +190,7 @@ class SACNetwork:
         of the hidden input.
         :param num_layers: Number of hidden layers for value network
         :param h_size: size of hidden layers for value network
-        :param scope: TF scope for value network.
+        :param scope: PT scope for value network.
         """
         with pt.variable_scope(scope):
             value_hidden = ModelUtils.create_vector_observation_encoder(
@@ -225,7 +225,7 @@ class SACNetwork:
         of the hidden input.
         :param num_layers: Number of hidden layers for Q network
         :param h_size: size of hidden layers for Q network
-        :param scope: TF scope for Q network.
+        :param scope: PT scope for Q network.
         :param reuse: Whether or not to reuse variables. Useful for creating Q of policy.
         :param num_outputs: Number of outputs of each Q function. If discrete, equal to number of actions.
         """

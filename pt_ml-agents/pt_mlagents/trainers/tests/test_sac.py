@@ -2,7 +2,7 @@ import pytest
 from unittest import mock
 import copy
 
-from pt_mlagents.tf_utils import tf
+from pt_mlagents.pt_utils import pt
 
 
 from pt_mlagents.trainers.sac.trainer import SACTrainer
@@ -47,7 +47,7 @@ def create_sac_optimizer_mock(dummy_config, use_rnn, use_discrete, use_visual):
         else None
     )
     policy = NNPolicy(
-        0, mock_brain, trainer_settings, False, "test", False, create_tf_graph=False
+        0, mock_brain, trainer_settings, False, "test", False, create_pt_graph=False
     )
     optimizer = SACOptimizer(policy, trainer_settings)
     return optimizer

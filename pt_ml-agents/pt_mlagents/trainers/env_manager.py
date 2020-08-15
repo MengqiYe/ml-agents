@@ -8,7 +8,7 @@ from pt_mlagents_envs.base_env import (
 )
 from pt_mlagents_envs.side_channel.stats_side_channel import StatsAggregationMethod
 
-from pt_mlagents.trainers.policy.tf_policy import TFPolicy
+from pt_mlagents.trainers.policy.pt_policy import PTPolicy
 from pt_mlagents.trainers.agent_processor import AgentManager, AgentManagerQueue
 from pt_mlagents.trainers.action_info import ActionInfo
 from pt_mlagents_envs.logging_util import get_logger
@@ -36,11 +36,11 @@ class EnvironmentStep(NamedTuple):
 
 class EnvManager(ABC):
     def __init__(self):
-        self.policies: Dict[BehaviorName, TFPolicy] = {}
+        self.policies: Dict[BehaviorName, PTPolicy] = {}
         self.agent_managers: Dict[BehaviorName, AgentManager] = {}
         self.first_step_infos: List[EnvironmentStep] = None
 
-    def set_policy(self, brain_name: BehaviorName, policy: TFPolicy) -> None:
+    def set_policy(self, brain_name: BehaviorName, policy: PTPolicy) -> None:
         self.policies[brain_name] = policy
         if brain_name in self.agent_managers:
             self.agent_managers[brain_name].policy = policy

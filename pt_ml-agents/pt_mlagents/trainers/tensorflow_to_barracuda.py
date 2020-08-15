@@ -3,7 +3,7 @@
 from __future__ import print_function
 import numpy as np
 import struct  # convert from Python values and C structs
-from pt_mlagents.tf_utils import tf
+from pt_mlagents.pt_utils import pt
 import re
 
 # import barracuda
@@ -94,7 +94,7 @@ known_classes = {
                 s[0][1],
                 s[0][3],
                 s[0][2],
-            ],  # K TF:[H, W, in_channels, channel_multiplier] => [H, W, 1, in_channels]
+            ],  # K PT:[H, W, in_channels, channel_multiplier] => [H, W, 1, in_channels]
             [1, 1, 1, s[-1][-1]] if len(s) > 1 else [1, 1, 1, s[0][2]],  # B
         ],
         patch_data=lambda data: [np.transpose(data[0], (0, 1, 3, 2)), data[1]],
@@ -108,7 +108,7 @@ known_classes = {
                 s[0][1],
                 s[0][3],
                 s[0][2],
-            ],  # K TF:[H, W, in_channels, out_channels] => [H, W, out_channels, in_channels]
+            ],  # K PT:[H, W, in_channels, out_channels] => [H, W, out_channels, in_channels]
             [1, 1, 1, s[-1][-1]] if len(s) > 1 else [1, 1, 1, s[0][2]],  # B
         ],
         patch_data=lambda data: [np.transpose(data[0], (0, 1, 3, 2)), data[1]],

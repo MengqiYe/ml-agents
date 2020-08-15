@@ -10,8 +10,9 @@ from threading import RLock
 
 from pt_mlagents_envs.logging_util import get_logger
 from pt_mlagents_envs.timers import set_gauge
-from pt_mlagents.tf_utils import tf, generate_session_config
+from pt_mlagents.pt_utils import pt, generate_session_config
 
+from tensorboardX import SummaryWriter, FileWriter
 
 logger = get_logger(__name__)
 
@@ -176,8 +177,8 @@ class TensorboardWriter(StatsWriter):
     ) -> None:
         self._maybe_create_summary_writer(category)
         for key, value in values.items():
-            summary = pt.Summary()
-            summary.value.add(tag="{}".format(key), simple_value=value.mean)
+            summary = SummaryWriter()
+            summary.add_scalar(tag="{}".format(key), scalar_value=value.mean)
             self.summary_writers[category].add_summary(summary, step)
             self.summary_writers[category].flush()
 
@@ -189,7 +190,7 @@ class TensorboardWriter(StatsWriter):
             os.makedirs(filewriter_dir, exist_ok=True)
             if self._clear_past_data:
                 self._delete_all_events_files(filewriter_dir)
-            self.summary_writers[category] = pt.summary.FileWriter(filewriter_dir)
+            self.summary_writers[category] = FileWriter(filewriter_dir)
 
     def _delete_all_events_files(self, directory_name: str) -> None:
         for file_name in os.listdir(directory_name):

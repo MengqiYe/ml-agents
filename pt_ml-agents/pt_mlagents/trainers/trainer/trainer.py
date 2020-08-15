@@ -8,7 +8,7 @@ from pt_mlagents_envs.logging_util import get_logger
 from pt_mlagents_envs.timers import timed
 from pt_mlagents_envs.base_env import BehaviorSpec
 from pt_mlagents.model_serialization import export_policy_model, SerializationSettings
-from pt_mlagents.trainers.policy.tf_policy import TFPolicy
+from pt_mlagents.trainers.policy.pt_policy import PTPolicy
 from pt_mlagents.trainers.stats import StatsReporter
 from pt_mlagents.trainers.trajectory import Trajectory
 from pt_mlagents.trainers.agent_processor import AgentManagerQueue
@@ -135,7 +135,7 @@ class Trainer(abc.ABC):
     @abc.abstractmethod
     def create_policy(
         self, parsed_behavior_id: BehaviorIdentifiers, behavior_spec: BehaviorSpec
-    ) -> TFPolicy:
+    ) -> PTPolicy:
         """
         Creates policy
         """
@@ -143,7 +143,7 @@ class Trainer(abc.ABC):
 
     @abc.abstractmethod
     def add_policy(
-        self, parsed_behavior_id: BehaviorIdentifiers, policy: TFPolicy
+        self, parsed_behavior_id: BehaviorIdentifiers, policy: PTPolicy
     ) -> None:
         """
         Adds policy to trainer.
@@ -151,7 +151,7 @@ class Trainer(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def get_policy(self, name_behavior_id: str) -> TFPolicy:
+    def get_policy(self, name_behavior_id: str) -> PTPolicy:
         """
         Gets policy from trainer.
         """

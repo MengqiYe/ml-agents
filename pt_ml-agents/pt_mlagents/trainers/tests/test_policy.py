@@ -1,4 +1,4 @@
-from pt_mlagents.trainers.policy.tf_policy import TFPolicy
+from pt_mlagents.trainers.policy.pt_policy import PTPolicy
 from pt_mlagents_envs.base_env import DecisionSteps, BehaviorSpec
 from pt_mlagents.trainers.action_info import ActionInfo
 from unittest.mock import MagicMock
@@ -14,8 +14,8 @@ def basic_mock_brain():
     return mock_brain
 
 
-class FakePolicy(TFPolicy):
-    def create_tf_graph(self):
+class FakePolicy(PTPolicy):
+    def create_pt_graph(self):
         pass
 
     def get_trainable_variables(self):
@@ -64,8 +64,8 @@ def test_take_action_returns_action_info_when_available():
 
 
 def test_convert_version_string():
-    result = TFPolicy._convert_version_string("200.300.100")
+    result = PTPolicy._convert_version_string("200.300.100")
     assert result == (200, 300, 100)
     # Test dev versions
-    result = TFPolicy._convert_version_string("200.300.100.dev0")
+    result = PTPolicy._convert_version_string("200.300.100.dev0")
     assert result == (200, 300, 100)

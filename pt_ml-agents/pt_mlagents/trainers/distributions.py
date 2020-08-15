@@ -2,7 +2,7 @@ import abc
 from typing import NamedTuple, List, Tuple
 import numpy as np
 
-from pt_mlagents.tf_utils import tf
+from pt_mlagents.pt_utils import pt
 from pt_mlagents.trainers.models import ModelUtils
 
 EPSILON = 1e-6  # Small value to avoid divide by zero

@@ -1,11 +1,11 @@
-from pt_mlagents.tf_utils import tf
+from pt_mlagents.pt_utils import pt
 
-from pt_mlagents.trainers.policy.tf_policy import TFPolicy
+from pt_mlagents.trainers.policy.pt_policy import PTPolicy
 
 
 class BCModel(object):
     def __init__(
-        self, policy: TFPolicy, learning_rate: float = 3e-4, anneal_steps: int = 0
+        self, policy: PTPolicy, learning_rate: float = 3e-4, anneal_steps: int = 0
     ):
         """
         Tensorflow operations to perform Behavioral Cloning on a Policy model

@@ -1,10 +1,10 @@
 from typing import Any, Dict, Optional, List
-from pt_mlagents.tf_utils import tf
+from pt_mlagents.pt_utils import pt
 from pt_mlagents_envs.timers import timed
 from pt_mlagents_envs.base_env import DecisionSteps, BehaviorSpec
 from pt_mlagents.trainers.models import EncoderType
 from pt_mlagents.trainers.models import ModelUtils
-from pt_mlagents.trainers.policy.tf_policy import TFPolicy
+from pt_mlagents.trainers.policy.pt_policy import PTPolicy
 from pt_mlagents.trainers.settings import TrainerSettings
 from pt_mlagents.trainers.distributions import (
     GaussianDistribution,
@@ -14,7 +14,7 @@ from pt_mlagents.trainers.distributions import (
 EPSILON = 1e-6  # Small value to avoid divide by zero
 
 
-class NNPolicy(TFPolicy):
+class NNPolicy(PTPolicy):
     def __init__(
         self,
         seed: int,
@@ -26,7 +26,7 @@ class NNPolicy(TFPolicy):
         tanh_squash: bool = False,
         reparameterize: bool = False,
         condition_sigma_on_obs: bool = True,
-        create_tf_graph: bool = True,
+        create_pt_graph: bool = True,
     ):
         """
         Policy that uses a multilayer perceptron to map the observations to actions. Could
@@ -59,17 +59,17 @@ class NNPolicy(TFPolicy):
         # good explanation and usually shouldn't be touched.
         self.log_std_min = -20
         self.log_std_max = 2
-        if create_tf_graph:
-            self.create_tf_graph()
+        if create_pt_graph:
+            self.create_pt_graph()
 
-    def get_trainable_variables(self) -> List[pt.Variable]:
+    def get_trainable_variables(self) -> List[pt.Tensor]:
         """
-        Returns a List of the trainable variables in this policy. if create_tf_graph hasn't been called,
+        Returns a List of the trainable variables in this policy. if create_pt_graph hasn't been called,
         returns empty list.
         """
         return self.trainable_variables
 
-    def create_tf_graph(self) -> None:
+    def create_pt_graph(self) -> None:
         """
         Builds the tensorflow graph needed for this policy.
         """

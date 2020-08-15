@@ -1,8 +1,8 @@
 from typing import Optional, Tuple
 
-from pt_mlagents.tf_utils import tf
+from pt_mlagents.pt_utils import pt
 
-from pt_mlagents.trainers.policy.tf_policy import TFPolicy
+from pt_mlagents.trainers.policy.pt_policy import PTPolicy
 from pt_mlagents.trainers.models import ModelUtils
 
 EPSILON = 1e-7
@@ -11,7 +11,7 @@ EPSILON = 1e-7
 class GAILModel(object):
     def __init__(
         self,
-        policy: TFPolicy,
+        policy: PTPolicy,
         h_size: int = 128,
         learning_rate: float = 3e-4,
         encoding_size: int = 64,

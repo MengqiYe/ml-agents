@@ -39,10 +39,10 @@ def test_load_and_set(dummy_config, use_discrete):
     trainer = PPOTrainer("test", 0, trainer_params, True, False, 0, "0")
     trainer.seed = 1
     policy = trainer.create_policy("test", mock_specs)
-    policy.create_tf_graph()
+    policy.create_pt_graph()
     trainer.seed = 20  # otherwise graphs are the same
     to_load_policy = trainer.create_policy("test", mock_specs)
-    to_load_policy.create_tf_graph()
+    to_load_policy.create_pt_graph()
     to_load_policy.init_load_weights()
 
     weights = policy.get_weights()

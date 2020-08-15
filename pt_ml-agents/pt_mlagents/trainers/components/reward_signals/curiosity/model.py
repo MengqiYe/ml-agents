@@ -1,13 +1,13 @@
 from typing import List, Tuple
-from pt_mlagents.tf_utils import tf
+from pt_mlagents.pt_utils import pt
 
 from pt_mlagents.trainers.models import ModelUtils
-from pt_mlagents.trainers.policy.tf_policy import TFPolicy
+from pt_mlagents.trainers.policy.pt_policy import PTPolicy
 
 
 class CuriosityModel(object):
     def __init__(
-        self, policy: TFPolicy, encoding_size: int = 128, learning_rate: float = 3e-4
+        self, policy: PTPolicy, encoding_size: int = 128, learning_rate: float = 3e-4
     ):
         """
         Creates the curiosity model for the Curiosity reward Generator

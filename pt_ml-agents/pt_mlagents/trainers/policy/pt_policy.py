@@ -4,8 +4,8 @@ import os
 import numpy as np
 from distutils.version import LooseVersion
 
-from pt_mlagents.tf_utils import tf
-from pt_mlagents import tf_utils
+from pt_mlagents.pt_utils import pt
+from pt_mlagents import pt_utils
 from pt_mlagents_envs.exception import UnityException
 from pt_mlagents_envs.base_env import BehaviorSpec
 from pt_mlagents_envs.logging_util import get_logger
@@ -35,7 +35,7 @@ class UnityPolicyException(UnityException):
     pass
 
 
-class TFPolicy(Policy):
+class PTPolicy(Policy):
     """
     Contains a learning model, and the necessary
     functions to save/load models and create the input placeholders.
@@ -94,7 +94,7 @@ class TFPolicy(Policy):
         self.keep_checkpoints = self.trainer_settings.keep_checkpoints
         self.graph = pt.Graph()
         self.sess = pt.Session(
-            config=tf_utils.generate_session_config(), graph=self.graph
+            config=pt_utils.generate_session_config(), graph=self.graph
         )
         self.saver: Optional[pt.Operation] = None
         self.seed = seed
@@ -105,15 +105,15 @@ class TFPolicy(Policy):
         self.load = load
 
     @abc.abstractmethod
-    def get_trainable_variables(self) -> List[pt.Variable]:
+    def get_trainable_variables(self) -> List[pt.Tensor]:
         """
-        Returns a List of the trainable variables in this policy. if create_tf_graph hasn't been called,
+        Returns a List of the trainable variables in this policy. if create_pt_graph hasn't been called,
         returns empty list.
         """
         pass
 
     @abc.abstractmethod
-    def create_tf_graph(self):
+    def create_pt_graph(self):
         """
         Builds the tensorflow graph needed for this policy.
         """
@@ -138,7 +138,7 @@ class TFPolicy(Policy):
             loaded_ver = tuple(
                 num.eval(session=self.sess) for num in self.version_tensors
             )
-            if loaded_ver != TFPolicy._convert_version_string(version):
+            if loaded_ver != PTPolicy._convert_version_string(version):
                 logger.warning(
                     f"The model checkpoint you are loading from was saved with ML-Agents version "
                     f"{loaded_ver[0]}.{loaded_ver[1]}.{loaded_ver[2]} but your current ML-Agents"
@@ -216,7 +216,7 @@ class TFPolicy(Policy):
     def load_weights(self, values):
         if len(self.assign_ops) == 0:
             logger.warning(
-                "Calling load_weights in tf_policy but assign_ops is empty. Did you forget to call init_load_weights?"
+                "Calling load_weights in pt_policy but assign_ops is empty. Did you forget to call init_load_weights?"
             )
         with self.graph.as_default():
             feed_dict = {}
@@ -498,7 +498,7 @@ class TFPolicy(Policy):
                 trainable=False,
                 dtype=pt.int32,
             )
-            int_version = TFPolicy._convert_version_string(__version__)
+            int_version = PTPolicy._convert_version_string(__version__)
             major_ver_t = pt.Variable(
                 int_version[0],
                 name="trainer_major_version",

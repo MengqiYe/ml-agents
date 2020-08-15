@@ -11,7 +11,7 @@ from pt_mlagents_envs.base_env import (
 )
 from pt_mlagents_envs.side_channel.stats_side_channel import StatsAggregationMethod
 from pt_mlagents.trainers.trajectory import Trajectory, AgentExperience
-from pt_mlagents.trainers.policy.tf_policy import TFPolicy
+from pt_mlagents.trainers.policy.pt_policy import PTPolicy
 from pt_mlagents.trainers.policy import Policy
 from pt_mlagents.trainers.action_info import ActionInfo, ActionInfoOutputs
 from pt_mlagents.trainers.stats import StatsReporter
@@ -29,7 +29,7 @@ class AgentProcessor:
 
     def __init__(
         self,
-        policy: TFPolicy,
+        policy: PTPolicy,
         behavior_id: str,
         stats_reporter: StatsReporter,
         max_trajectory_length: int = sys.maxsize,
@@ -287,7 +287,7 @@ class AgentManager(AgentProcessor):
 
     def __init__(
         self,
-        policy: TFPolicy,
+        policy: PTPolicy,
         behavior_id: str,
         stats_reporter: StatsReporter,
         max_trajectory_length: int = sys.maxsize,

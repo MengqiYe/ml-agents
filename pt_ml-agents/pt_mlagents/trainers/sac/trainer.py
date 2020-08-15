@@ -12,7 +12,7 @@ import numpy as np
 from pt_mlagents_envs.logging_util import get_logger
 from pt_mlagents_envs.timers import timed
 from pt_mlagents_envs.base_env import BehaviorSpec
-from pt_mlagents.trainers.policy.tf_policy import TFPolicy
+from pt_mlagents.trainers.policy.pt_policy import PTPolicy
 from pt_mlagents.trainers.policy.nn_policy import NNPolicy
 from pt_mlagents.trainers.sac.optimizer import SACOptimizer
 from pt_mlagents.trainers.trainer.rl_trainer import RLTrainer
@@ -186,7 +186,7 @@ class SACTrainer(RLTrainer):
 
     def create_policy(
         self, parsed_behavior_id: BehaviorIdentifiers, behavior_spec: BehaviorSpec
-    ) -> TFPolicy:
+    ) -> PTPolicy:
         policy = NNPolicy(
             self.seed,
             behavior_spec,
@@ -196,7 +196,7 @@ class SACTrainer(RLTrainer):
             self.load,
             tanh_squash=True,
             reparameterize=True,
-            create_tf_graph=False,
+            create_pt_graph=False,
         )
         # Load the replay buffer if load
         if self.load and self.checkpoint_replay_buffer:
@@ -304,7 +304,7 @@ class SACTrainer(RLTrainer):
                 self._stats_reporter.add_stat(stat, np.mean(stat_list))
 
     def add_policy(
-        self, parsed_behavior_id: BehaviorIdentifiers, policy: TFPolicy
+        self, parsed_behavior_id: BehaviorIdentifiers, policy: PTPolicy
     ) -> None:
         """
         Adds policy to trainer.
@@ -331,7 +331,7 @@ class SACTrainer(RLTrainer):
             max(1, self.step / self.reward_signal_steps_per_update)
         )
 
-    def get_policy(self, name_behavior_id: str) -> TFPolicy:
+    def get_policy(self, name_behavior_id: str) -> PTPolicy:
         """
         Gets policy from trainer associated with name_behavior_id
         :param name_behavior_id: full identifier of policy

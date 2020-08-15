@@ -1,13 +1,13 @@
 import numpy as np
 from typing import Dict, List, Optional, Any, Mapping, cast
 
-from pt_mlagents.tf_utils import tf
+from pt_mlagents.pt_utils import pt
 
 from pt_mlagents_envs.logging_util import get_logger
 from pt_mlagents.trainers.sac.network import SACPolicyNetwork, SACTargetNetwork
 from pt_mlagents.trainers.models import ModelUtils
-from pt_mlagents.trainers.optimizer.tf_optimizer import TFOptimizer
-from pt_mlagents.trainers.policy.tf_policy import TFPolicy
+from pt_mlagents.trainers.optimizer.pt_optimizer import PTOptimizer
+from pt_mlagents.trainers.policy.pt_policy import PTPolicy
 from pt_mlagents.trainers.buffer import AgentBuffer
 from pt_mlagents_envs.timers import timed
 from pt_mlagents.trainers.settings import TrainerSettings, SACSettings
@@ -20,8 +20,8 @@ POLICY_SCOPE = ""
 TARGET_SCOPE = "target_network"
 
 
-class SACOptimizer(TFOptimizer):
-    def __init__(self, policy: TFPolicy, trainer_params: TrainerSettings):
+class SACOptimizer(PTOptimizer):
+    def __init__(self, policy: PTPolicy, trainer_params: TrainerSettings):
         """
         Takes a Unity environment and model-specific hyper-parameters and returns the
         appropriate PPO agent model for the environment.
@@ -39,8 +39,8 @@ class SACOptimizer(TFOptimizer):
         :param tau: Strength of soft-Q update.
         :param m_size: Size of brain memory.
         """
-        # Create the graph here to give more granular control of the TF graph to the Optimizer.
-        policy.create_tf_graph()
+        # Create the graph here to give more granular control of the PT graph to the Optimizer.
+        policy.create_pt_graph()
 
         with policy.graph.as_default():
             with pt.variable_scope(""):
@@ -587,7 +587,7 @@ class SACOptimizer(TFOptimizer):
             stats_needed.update(self.reward_signals[name].stats_name_to_update_name)
 
     def _construct_feed_dict(
-        self, policy: TFPolicy, batch: AgentBuffer, num_sequences: int
+        self, policy: PTPolicy, batch: AgentBuffer, num_sequences: int
     ) -> Dict[pt.Tensor, Any]:
         """
         Builds the feed dict for updating the SAC model.

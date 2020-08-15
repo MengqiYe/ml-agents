@@ -4,7 +4,7 @@ from typing import Any, List, Set, NamedTuple
 from distutils.version import LooseVersion
 
 try:
-    from tf2onnx.tfonnx import process_tf_graph, tf_optimize
+    from tf2onnx.tfonnx import process_pt_graph, pt_optimize
     from tf2onnx import optimizer
 
     ONNX_EXPORT_ENABLED = True
@@ -66,12 +66,12 @@ class SerializationSettings(NamedTuple):
 
 
 def export_policy_model(
-    settings: SerializationSettings, graph: pt.Graph, sess: pt.Session
+    settings: SerializationSettings, graph: pt.Graph,# sess: pt.Session
 ) -> None:
     """
     Exports latest saved model to .nn format for Unity embedding.
     """
-    frozen_graph_def = _make_frozen_graph(settings, graph, sess)
+    frozen_graph_def = _make_frozen_graph(settings, graph)
     # Save frozen graph
     frozen_graph_def_path = settings.model_path + "/frozen_graph_def.pb"
     with gfile.GFile(frozen_graph_def_path, "wb") as f:
@@ -109,19 +109,19 @@ def export_policy_model(
 
 
 def _make_frozen_graph(
-    settings: SerializationSettings, graph: pt.Graph, sess: pt.Session
-) -> pt.GraphDef:
+    settings: SerializationSettings, graph: pt.Graph,# sess: pt.Session
+) -> None: # pt.GraphDef:
     with graph.as_default():
         target_nodes = ",".join(_process_graph(settings, graph))
         graph_def = graph.as_graph_def()
         output_graph_def = graph_util.convert_variables_to_constants(
-            sess, graph_def, target_nodes.replace(" ", "").split(",")
+            graph_def, target_nodes.replace(" ", "").split(",")
         )
     return output_graph_def
 
 
 def convert_frozen_to_onnx(
-    settings: SerializationSettings, frozen_graph_def: pt.GraphDef
+    settings: SerializationSettings, frozen_graph_def: None # pt.GraphDef
 ) -> Any:
     # This is basically https://github.com/onnx/tensorflow-onnx/blob/master/tf2onnx/convert.py
 
@@ -129,15 +129,15 @@ def convert_frozen_to_onnx(
     outputs = _get_output_node_names(frozen_graph_def)
     logger.info(f"onnx export - inputs:{inputs} outputs:{outputs}")
 
-    frozen_graph_def = tf_optimize(
+    frozen_graph_def = pt_optimize(
         inputs, outputs, frozen_graph_def, fold_constant=True
     )
 
-    with pt.Graph().as_default() as tf_graph:
+    with pt.Graph().as_default() as pt_graph:
         pt.import_graph_def(frozen_graph_def, name="")
-    with pt.Session(graph=tf_graph):
-        g = process_tf_graph(
-            tf_graph,
+    with pt.Session(graph=pt_graph):
+        g = process_pt_graph(
+            pt_graph,
             input_names=inputs,
             output_names=outputs,
             opset=settings.onnx_opset,

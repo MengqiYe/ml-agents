@@ -70,7 +70,7 @@ def create_optimizer_mock(
         else None
     )
     policy = NNPolicy(
-        0, mock_specs, trainer_settings, False, "test", False, create_tf_graph=False
+        0, mock_specs, trainer_settings, False, "test", False, create_pt_graph=False
     )
     if trainer_settings.trainer_type == TrainerType.SAC:
         optimizer = SACOptimizer(policy, trainer_settings)

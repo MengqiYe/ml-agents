@@ -1,24 +1,24 @@
 from typing import Optional, Any, Dict, cast
 import numpy as np
-from pt_mlagents.tf_utils import tf
+from pt_mlagents.pt_utils import pt
 from pt_mlagents_envs.timers import timed
 from pt_mlagents.trainers.models import ModelUtils, EncoderType
-from pt_mlagents.trainers.policy.tf_policy import TFPolicy
-from pt_mlagents.trainers.optimizer.tf_optimizer import TFOptimizer
+from pt_mlagents.trainers.policy.pt_policy import PTPolicy
+from pt_mlagents.trainers.optimizer.pt_optimizer import PTOptimizer
 from pt_mlagents.trainers.buffer import AgentBuffer
 from pt_mlagents.trainers.settings import TrainerSettings, PPOSettings
 
 
-class PPOOptimizer(TFOptimizer):
-    def __init__(self, policy: TFPolicy, trainer_params: TrainerSettings):
+class PPOOptimizer(PTOptimizer):
+    def __init__(self, policy: PTPolicy, trainer_params: TrainerSettings):
         """
         Takes a Policy and a Dict of trainer parameters and creates an Optimizer around the policy.
         The PPO optimizer has a value estimator and a loss function.
-        :param policy: A TFPolicy object that will be updated by this PPO Optimizer.
+        :param policy: A PTPolicy object that will be updated by this PPO Optimizer.
         :param trainer_params: Trainer parameters dictionary that specifies the properties of the trainer.
         """
-        # Create the graph here to give more granular control of the TF graph to the Optimizer.
-        policy.create_tf_graph()
+        # Create the graph here to give more granular control of the PT graph to the Optimizer.
+        policy.create_pt_graph()
 
         with policy.graph.as_default():
             with pt.variable_scope("optimizer/"):
@@ -40,7 +40,7 @@ class PPOOptimizer(TFOptimizer):
 
                 self.stream_names = list(self.reward_signals.keys())
 
-                self.tf_optimizer: Optional[pt.train.AdamOptimizer] = None
+                self.pt_optimizer: Optional[pt.train.AdamOptimizer] = None
                 self.grads = None
                 self.update_batch: Optional[pt.Operation] = None
 
@@ -291,9 +291,9 @@ class PPOOptimizer(TFOptimizer):
         )
 
     def _create_ppo_optimizer_ops(self):
-        self.tf_optimizer = self.create_optimizer_op(self.learning_rate)
-        self.grads = self.tf_optimizer.compute_gradients(self.loss)
-        self.update_batch = self.tf_optimizer.minimize(self.loss)
+        self.pt_optimizer = self.create_optimizer_op(self.learning_rate)
+        self.grads = self.pt_optimizer.compute_gradients(self.loss)
+        self.update_batch = self.pt_optimizer.minimize(self.loss)
 
     @timed
     def update(self, batch: AgentBuffer, num_sequences: int) -> Dict[str, float]:

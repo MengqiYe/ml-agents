@@ -53,8 +53,8 @@ class StatsMetaDataTest(unittest.TestCase):
             version_statsmetadata = StatusMetaData(pt_mlagents_version="test")
             default_metadata.check_compatibility(version_statsmetadata)
 
-            tf_version_statsmetadata = StatusMetaData(tensorflow_version="test")
-            default_metadata.check_compatibility(tf_version_statsmetadata)
+            pt_version_statsmetadata = StatusMetaData(tensorflow_version="test")
+            default_metadata.check_compatibility(pt_version_statsmetadata)
 
         # Assert that 2 warnings have been thrown
         assert len(cm.output) == 2

@@ -11,7 +11,7 @@ from pt_mlagents_envs.logging_util import get_logger
 from pt_mlagents_envs.base_env import BehaviorSpec
 from pt_mlagents.trainers.policy.nn_policy import NNPolicy
 from pt_mlagents.trainers.trainer.rl_trainer import RLTrainer
-from pt_mlagents.trainers.policy.tf_policy import TFPolicy
+from pt_mlagents.trainers.policy.pt_policy import PTPolicy
 from pt_mlagents.trainers.ppo.optimizer import PPOOptimizer
 from pt_mlagents.trainers.trajectory import Trajectory
 from pt_mlagents.trainers.behavior_id_utils import BehaviorIdentifiers
@@ -192,7 +192,7 @@ class PPOTrainer(RLTrainer):
 
     def create_policy(
         self, parsed_behavior_id: BehaviorIdentifiers, behavior_spec: BehaviorSpec
-    ) -> TFPolicy:
+    ) -> PTPolicy:
         """
         Creates a PPO policy to trainers list of policies.
         :param behavior_spec: specifications for policy construction
@@ -206,13 +206,13 @@ class PPOTrainer(RLTrainer):
             self.artifact_path,
             self.load,
             condition_sigma_on_obs=False,  # Faster training for PPO
-            create_tf_graph=False,  # We will create the TF graph in the Optimizer
+            create_pt_graph=False,  # We will create the PT graph in the Optimizer
         )
 
         return policy
 
     def add_policy(
-        self, parsed_behavior_id: BehaviorIdentifiers, policy: TFPolicy
+        self, parsed_behavior_id: BehaviorIdentifiers, policy: PTPolicy
     ) -> None:
         """
         Adds policy to trainer.
@@ -235,7 +235,7 @@ class PPOTrainer(RLTrainer):
         # Needed to resume loads properly
         self.step = policy.get_current_step()
 
-    def get_policy(self, name_behavior_id: str) -> TFPolicy:
+    def get_policy(self, name_behavior_id: str) -> PTPolicy:
         """
         Gets policy from trainer associated with name_behavior_id
         :param name_behavior_id: full identifier of policy

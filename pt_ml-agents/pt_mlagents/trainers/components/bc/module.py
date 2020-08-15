@@ -1,7 +1,7 @@
 from typing import Dict, Any
 import numpy as np
 
-from pt_mlagents.trainers.policy.tf_policy import TFPolicy
+from pt_mlagents.trainers.policy.pt_policy import PTPolicy
 from .model import BCModel
 from pt_mlagents.trainers.demo_loader import demo_to_buffer
 from pt_mlagents.trainers.settings import BehavioralCloningSettings
@@ -10,7 +10,7 @@ from pt_mlagents.trainers.settings import BehavioralCloningSettings
 class BCModule:
     def __init__(
         self,
-        policy: TFPolicy,
+        policy: PTPolicy,
         settings: BehavioralCloningSettings,
         policy_learning_rate: float,
         default_batch_size: int,

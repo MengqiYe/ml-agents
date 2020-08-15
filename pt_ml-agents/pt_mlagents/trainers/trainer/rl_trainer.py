@@ -5,7 +5,7 @@ import abc
 import time
 
 from pt_mlagents_envs.logging_util import get_logger
-from pt_mlagents.trainers.optimizer.tf_optimizer import TFOptimizer
+from pt_mlagents.trainers.optimizer.pt_optimizer import PTOptimizer
 from pt_mlagents.trainers.buffer import AgentBuffer
 from pt_mlagents.trainers.trainer import Trainer
 from pt_mlagents.trainers.components.reward_signals import RewardSignalResult
@@ -49,7 +49,7 @@ class RLTrainer(Trainer):  # pylint: disable=abstract-method
             for agent_id in rewards:
                 rewards[agent_id] = 0
 
-    def _update_end_episode_stats(self, agent_id: str, optimizer: TFOptimizer) -> None:
+    def _update_end_episode_stats(self, agent_id: str, optimizer: PTOptimizer) -> None:
         for name, rewards in self.collected_rewards.items():
             if name == "environment":
                 self.stats_reporter.add_stat(

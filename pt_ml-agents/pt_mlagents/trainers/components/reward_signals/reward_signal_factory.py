@@ -8,7 +8,7 @@ from pt_mlagents.trainers.components.reward_signals.gail.signal import GAILRewar
 from pt_mlagents.trainers.components.reward_signals.curiosity.signal import (
     CuriosityRewardSignal,
 )
-from pt_mlagents.trainers.policy.tf_policy import TFPolicy
+from pt_mlagents.trainers.policy.pt_policy import PTPolicy
 from pt_mlagents.trainers.settings import RewardSignalSettings, RewardSignalType
 
 
@@ -20,7 +20,7 @@ NAME_TO_CLASS: Dict[RewardSignalType, Type[RewardSignal]] = {
 
 
 def create_reward_signal(
-    policy: TFPolicy, name: RewardSignalType, settings: RewardSignalSettings
+    policy: PTPolicy, name: RewardSignalType, settings: RewardSignalSettings
 ) -> RewardSignal:
     """
     Creates a reward signal class based on the name and config entry provided as a dict.

@@ -22,7 +22,7 @@ def set_warnings_enabled(is_enabled: bool) -> None:
     pt_logging.set_verbosity(level)
 
 
-def generate_session_config() -> pt.ConfigProto:
+def generate_session_config() -> None:
     """
     Generate a ConfigProto to use for ML-Agents that doesn't consume all of the GPU memory
     and allows for soft placement in the case of multi-GPU.

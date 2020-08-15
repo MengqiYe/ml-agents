@@ -1,9 +1,9 @@
 from typing import Dict, Any, List, Tuple, Optional
 import numpy as np
 
-from pt_mlagents.tf_utils.tf import tf
+from pt_mlagents.pt_utils.pt import pt
 from pt_mlagents.trainers.buffer import AgentBuffer
-from pt_mlagents.trainers.policy.tf_policy import TFPolicy
+from pt_mlagents.trainers.policy.pt_policy import PTPolicy
 from pt_mlagents.trainers.optimizer import Optimizer
 from pt_mlagents.trainers.trajectory import SplitObservations
 from pt_mlagents.trainers.components.reward_signals.reward_signal_factory import (
@@ -13,8 +13,8 @@ from pt_mlagents.trainers.settings import TrainerSettings, RewardSignalType
 from pt_mlagents.trainers.components.bc.module import BCModule
 
 
-class TFOptimizer(Optimizer):  # pylint: disable=W0223
-    def __init__(self, policy: TFPolicy, trainer_params: TrainerSettings):
+class PTOptimizer(Optimizer):  # pylint: disable=W0223
+    def __init__(self, policy: PTPolicy, trainer_params: TrainerSettings):
         self.sess = policy.sess
         self.policy = policy
         self.update_dict: Dict[str, pt.Tensor] = {}
@@ -142,7 +142,7 @@ class TFOptimizer(Optimizer):  # pylint: disable=W0223
 
     def create_optimizer_op(
         self, learning_rate: pt.Tensor, name: str = "Adam"
-    ) -> pt.train.Optimizer:
+    ) -> None: # pt.train.Optimizer:
         return pt.train.AdamOptimizer(learning_rate=learning_rate, name=name)
 
     def _execute_model(

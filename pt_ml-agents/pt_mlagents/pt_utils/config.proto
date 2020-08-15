@@ -20,7 +20,7 @@ message ConfigProto {
   //
   // There are notable exceptions to the default behavior describe above:
   // 1. There is an environment variable  for overriding this thread pool,
-  //    named TF_OVERRIDE_GLOBAL_THREADPOOL.
+  //    named pt_OVERRIDE_GLOBAL_THREADPOOL.
   // 2. When connecting to a server, such as a remote `tf.train.Server`
   //    instance, then this option will be ignored altogether.
   int32 intra_op_parallelism_threads = 2;
@@ -155,11 +155,11 @@ message ConfigProto {
 
     // In the following, session state means the value of a variable, elements
     // in a hash table, or any other resource, accessible by worker sessions
-    // held by a TF server.
+    // held by a PT server.
     //
     // When ClusterSpec propagation is enabled, the value of
     // isolate_session_state is ignored when deciding whether to share session
-    // states in a TF server (for backwards compatibility reasons).
+    // states in a PT server (for backwards compatibility reasons).
     // - If share_session_state_in_clusterspec_propagation is true, the session
     // states are shared.
     // - If share_session_state_in_clusterspec_propagation is false, session
@@ -167,7 +167,7 @@ message ConfigProto {
     //
     // When clusterspec propagation is not used, the value of
     // share_session_state_in_clusterspec_propagation is ignored when deciding
-    // whether to share session states in a TF server.
+    // whether to share session states in a PT server.
     // - If isolate_session_state is true, session states are isolated.
     // - If isolate_session_state is false, session states are shared.
     //
@@ -201,7 +201,7 @@ message ConfigProto {
     // Session::Extend() may not be supported.
     bool optimize_for_static_graph = 12;
 
-    // Whether to enable the MLIR-based TF->XLA bridge.
+    // Whether to enable the MLIR-based PT->XLA bridge.
     //
     // This is a replacement to the existing bridge, and not ready for
     // production usage yet.

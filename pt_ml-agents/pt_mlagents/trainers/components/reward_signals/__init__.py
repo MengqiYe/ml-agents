@@ -3,10 +3,10 @@ from collections import namedtuple
 import numpy as np
 import abc
 
-from pt_mlagents.tf_utils import tf
+from pt_mlagents.pt_utils import pt
 
 from pt_mlagents_envs.logging_util import get_logger
-from pt_mlagents.trainers.policy.tf_policy import TFPolicy
+from pt_mlagents.trainers.policy.pt_policy import PTPolicy
 from pt_mlagents.trainers.buffer import AgentBuffer
 from pt_mlagents.trainers.settings import RewardSignalSettings
 
@@ -19,7 +19,7 @@ RewardSignalResult = namedtuple(
 
 
 class RewardSignal(abc.ABC):
-    def __init__(self, policy: TFPolicy, settings: RewardSignalSettings):
+    def __init__(self, policy: PTPolicy, settings: RewardSignalSettings):
         """
         Initializes a reward signal. At minimum, you must pass in the policy it is being applied to,
         the reward strength, and the gamma (discount factor.)
@@ -55,7 +55,7 @@ class RewardSignal(abc.ABC):
         )
 
     def prepare_update(
-        self, policy: TFPolicy, mini_batch: AgentBuffer, num_sequences: int
+        self, policy: PTPolicy, mini_batch: AgentBuffer, num_sequences: int
     ) -> Dict[pt.Tensor, Any]:
         """
         If the reward signal has an internal model (e.g. GAIL or Curiosity), get the feed_dict

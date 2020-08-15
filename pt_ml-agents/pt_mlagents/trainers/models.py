@@ -2,7 +2,7 @@ from enum import Enum
 from typing import Callable, Dict, List, Tuple, NamedTuple
 
 import numpy as np
-from pt_mlagents.tf_utils import tf
+from pt_mlagents.pt_utils import pt
 
 from pt_mlagents.trainers.exception import UnityTrainerException
 
@@ -32,7 +32,8 @@ class ScheduleType(Enum):
 
 
 class NormalizerTensors(NamedTuple):
-    update_op: pt.Operation
+    # FIXME: Find what is Operation in pytorch.
+    update_op: None # pt.Operation
     steps: pt.Tensor
     running_mean: pt.Tensor
     running_variance: pt.Tensor
@@ -49,7 +50,7 @@ class ModelUtils:
 
     @staticmethod
     def create_global_steps():
-        """Creates TF ops to track and increment global training step."""
+        """Creates PT ops to track and increment global training step."""
         global_step = pt.Variable(
             0, name="global_step", trainable=False, dtype=pt.int32
         )
@@ -71,7 +72,7 @@ class ModelUtils:
         Create a learning rate tensor.
         :param lr_schedule: Type of learning rate schedule.
         :param lr: Base learning rate.
-        :param global_step: A TF Tensor representing the total global step.
+        :param global_step: A PT Tensor representing the total global step.
         :param max_step: The maximum number of steps in the training run.
         :return: A Tensor containing the learning rate.
         """
@@ -234,14 +235,14 @@ class ModelUtils:
         steps: pt.Tensor,
         running_mean: pt.Tensor,
         running_variance: pt.Tensor,
-    ) -> pt.Operation:
+    ) -> None: # pt.Operation:
         """
         Creates the update operation for the normalizer.
         :param vector_input: Vector observation to use for updating the running mean and variance.
         :param running_mean: Tensorflow tensor representing the current running mean.
         :param running_variance: Tensorflow tensor representing the current running variance.
         :param steps: Tensorflow tensor representing the current number of steps that have been normalized.
-        :return: A TF operation that updates the normalization based on vector_input.
+        :return: A PT operation that updates the normalization based on vector_input.
         """
         # Based on Welford's algorithm for running mean and standard deviation, for batch updates. Discussion here:
         # https://stackoverflow.com/questions/56402955/whats-the-formula-for-welfords-algorithm-for-variance-std-with-batch-updates
@@ -565,7 +566,7 @@ class ModelUtils:
         :param h_size: Size of hidden linear layers in stream.
         :param num_layers: Number of hidden linear layers in stream.
         :param stream_scopes: List of strings (length == num_streams), which contains
-            the scopes for each of the streams. None if all under the same TF scope.
+            the scopes for each of the streams. None if all under the same PT scope.
         :return: List of encoded streams.
         """
         activation_fn = ModelUtils.swish
