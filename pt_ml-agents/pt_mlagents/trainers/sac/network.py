@@ -1,5 +1,5 @@
 from typing import Dict, Optional
-from pt_mlagents.pt_utils import pt
+from pt_mlagents.pt_utils import torch
 from pt_mlagents.trainers.models import ModelUtils, EncoderType
 
 LOG_STD_MAX = 2
@@ -34,47 +34,47 @@ class SACNetwork:
         self.h_size = h_size
         self.activ_fn = ModelUtils.swish
 
-        self.sequence_length_ph = pt.placeholder(
-            shape=None, dtype=pt.int32, name="sac_sequence_length"
+        self.sequence_length_ph = torch.placeholder(
+            shape=None, dtype=torch.int32, name="sac_sequence_length"
         )
 
-        self.policy_memory_in: Optional[pt.Tensor] = None
-        self.policy_memory_out: Optional[pt.Tensor] = None
-        self.value_memory_in: Optional[pt.Tensor] = None
-        self.value_memory_out: Optional[pt.Tensor] = None
-        self.q1: Optional[pt.Tensor] = None
-        self.q2: Optional[pt.Tensor] = None
-        self.q1_p: Optional[pt.Tensor] = None
-        self.q2_p: Optional[pt.Tensor] = None
-        self.q1_memory_in: Optional[pt.Tensor] = None
-        self.q2_memory_in: Optional[pt.Tensor] = None
-        self.q1_memory_out: Optional[pt.Tensor] = None
-        self.q2_memory_out: Optional[pt.Tensor] = None
-        self.prev_action: Optional[pt.Tensor] = None
-        self.action_masks: Optional[pt.Tensor] = None
-        self.external_action_in: Optional[pt.Tensor] = None
-        self.log_sigma_sq: Optional[pt.Tensor] = None
-        self.entropy: Optional[pt.Tensor] = None
-        self.deterministic_output: Optional[pt.Tensor] = None
-        self.normalized_logprobs: Optional[pt.Tensor] = None
-        self.action_probs: Optional[pt.Tensor] = None
-        self.output_oh: Optional[pt.Tensor] = None
-        self.output_pre: Optional[pt.Tensor] = None
+        self.policy_memory_in: Optional[torch.Tensor] = None
+        self.policy_memory_out: Optional[torch.Tensor] = None
+        self.value_memory_in: Optional[torch.Tensor] = None
+        self.value_memory_out: Optional[torch.Tensor] = None
+        self.q1: Optional[torch.Tensor] = None
+        self.q2: Optional[torch.Tensor] = None
+        self.q1_p: Optional[torch.Tensor] = None
+        self.q2_p: Optional[torch.Tensor] = None
+        self.q1_memory_in: Optional[torch.Tensor] = None
+        self.q2_memory_in: Optional[torch.Tensor] = None
+        self.q1_memory_out: Optional[torch.Tensor] = None
+        self.q2_memory_out: Optional[torch.Tensor] = None
+        self.prev_action: Optional[torch.Tensor] = None
+        self.action_masks: Optional[torch.Tensor] = None
+        self.external_action_in: Optional[torch.Tensor] = None
+        self.log_sigma_sq: Optional[torch.Tensor] = None
+        self.entropy: Optional[torch.Tensor] = None
+        self.deterministic_output: Optional[torch.Tensor] = None
+        self.normalized_logprobs: Optional[torch.Tensor] = None
+        self.action_probs: Optional[torch.Tensor] = None
+        self.output_oh: Optional[torch.Tensor] = None
+        self.output_pre: Optional[torch.Tensor] = None
 
         self.value_vars = None
         self.q_vars = None
         self.critic_vars = None
         self.policy_vars = None
 
-        self.q1_heads: Dict[str, pt.Tensor] = None
-        self.q2_heads: Dict[str, pt.Tensor] = None
-        self.q1_pheads: Dict[str, pt.Tensor] = None
-        self.q2_pheads: Dict[str, pt.Tensor] = None
+        self.q1_heads: Dict[str, torch.Tensor] = None
+        self.q2_heads: Dict[str, torch.Tensor] = None
+        self.q1_pheads: Dict[str, torch.Tensor] = None
+        self.q2_pheads: Dict[str, torch.Tensor] = None
 
         self.policy = policy
 
     def get_vars(self, scope):
-        return pt.get_collection(pt.GraphKeys.TRAINABLE_VARIABLES, scope=scope)
+        return torch.get_collection(torch.GraphKeys.TRAINABLE_VARIABLES, scope=scope)
 
     def join_scopes(self, scope_1, scope_2):
         """
@@ -99,9 +99,9 @@ class SACNetwork:
         """
         self.value_heads = {}
         for name in stream_names:
-            value = pt.layers.dense(hidden_input, 1, name="{}_value".format(name))
+            value = torch.layers.dense(hidden_input, 1, name="{}_value".format(name))
             self.value_heads[name] = value
-        self.value = pt.reduce_mean(list(self.value_heads.values()), 0)
+        self.value = torch.reduce_mean(list(self.value_heads.values()), 0)
 
     def _create_cc_critic(self, hidden_value, scope, create_qs=True):
         """
@@ -115,15 +115,15 @@ class SACNetwork:
             self.h_size,
             self.join_scopes(scope, "value"),
         )
-        self.external_action_in = pt.placeholder(
+        self.external_action_in = torch.placeholder(
             shape=[None, self.policy.act_size[0]],
-            dtype=pt.float32,
+            dtype=torch.float32,
             name="external_action_in",
         )
         self.value_vars = self.get_vars(self.join_scopes(scope, "value"))
         if create_qs:
-            hidden_q = pt.concat([hidden_value, self.external_action_in], axis=-1)
-            hidden_qp = pt.concat([hidden_value, self.policy.output], axis=-1)
+            hidden_q = torch.concat([hidden_value, self.external_action_in], axis=-1)
+            hidden_qp = torch.concat([hidden_value, self.policy.output], axis=-1)
             self.q1_heads, self.q2_heads, self.q1, self.q2 = self.create_q_heads(
                 self.stream_names,
                 hidden_q,
@@ -192,7 +192,7 @@ class SACNetwork:
         :param h_size: size of hidden layers for value network
         :param scope: PT scope for value network.
         """
-        with pt.variable_scope(scope):
+        with torch.variable_scope(scope):
             value_hidden = ModelUtils.create_vector_observation_encoder(
                 hidden_input, h_size, self.activ_fn, num_layers, "encoder", False
             )
@@ -229,7 +229,7 @@ class SACNetwork:
         :param reuse: Whether or not to reuse variables. Useful for creating Q of policy.
         :param num_outputs: Number of outputs of each Q function. If discrete, equal to number of actions.
         """
-        with pt.variable_scope(self.join_scopes(scope, "q1_encoding"), reuse=reuse):
+        with torch.variable_scope(self.join_scopes(scope, "q1_encoding"), reuse=reuse):
             q1_hidden = ModelUtils.create_vector_observation_encoder(
                 hidden_input, h_size, self.activ_fn, num_layers, "q1_encoder", reuse
             )
@@ -244,11 +244,11 @@ class SACNetwork:
 
             q1_heads = {}
             for name in stream_names:
-                _q1 = pt.layers.dense(q1_hidden, num_outputs, name="{}_q1".format(name))
+                _q1 = torch.layers.dense(q1_hidden, num_outputs, name="{}_q1".format(name))
                 q1_heads[name] = _q1
 
-            q1 = pt.reduce_mean(list(q1_heads.values()), axis=0)
-        with pt.variable_scope(self.join_scopes(scope, "q2_encoding"), reuse=reuse):
+            q1 = torch.reduce_mean(list(q1_heads.values()), axis=0)
+        with torch.variable_scope(self.join_scopes(scope, "q2_encoding"), reuse=reuse):
             q2_hidden = ModelUtils.create_vector_observation_encoder(
                 hidden_input, h_size, self.activ_fn, num_layers, "q2_encoder", reuse
             )
@@ -263,10 +263,10 @@ class SACNetwork:
 
             q2_heads = {}
             for name in stream_names:
-                _q2 = pt.layers.dense(q2_hidden, num_outputs, name="{}_q2".format(name))
+                _q2 = torch.layers.dense(q2_hidden, num_outputs, name="{}_q2".format(name))
                 q2_heads[name] = _q2
 
-            q2 = pt.reduce_mean(list(q2_heads.values()), axis=0)
+            q2 = torch.reduce_mean(list(q2_heads.values()), axis=0)
 
         return q1_heads, q2_heads, q1, q2
 
@@ -298,7 +298,7 @@ class SACTargetNetwork(SACNetwork):
             stream_names,
             vis_encode_type,
         )
-        with pt.variable_scope(TARGET_SCOPE):
+        with torch.variable_scope(TARGET_SCOPE):
             self.vector_in, self.visual_in = ModelUtils.create_input_placeholders(
                 self.policy.behavior_spec.observation_shapes
             )
@@ -319,8 +319,8 @@ class SACTargetNetwork(SACNetwork):
                 self.update_normalization_op = None
 
             if self.policy.use_recurrent:
-                self.memory_in = pt.placeholder(
-                    shape=[None, m_size], dtype=pt.float32, name="target_recurrent_in"
+                self.memory_in = torch.placeholder(
+                    shape=[None, m_size], dtype=torch.float32, name="target_recurrent_in"
                 )
                 self.value_memory_in = self.memory_in
             hidden_streams = ModelUtils.create_observation_streams(
@@ -337,7 +337,7 @@ class SACTargetNetwork(SACNetwork):
         else:
             self._create_dc_critic(hidden_streams[0], TARGET_SCOPE, create_qs=False)
         if self.use_recurrent:
-            self.memory_out = pt.concat(
+            self.memory_out = torch.concat(
                 self.value_memory_out, axis=1
             )  # Needed for Barracuda to work
 
@@ -350,10 +350,10 @@ class SACTargetNetwork(SACNetwork):
         param variance: Tensor containing the variance
         param steps: Tensor containing the number of steps.
         """
-        update_mean = pt.assign(self.running_mean, mean)
-        update_variance = pt.assign(self.running_variance, variance)
-        update_norm_step = pt.assign(self.normalization_steps, steps)
-        return pt.group([update_mean, update_variance, update_norm_step])
+        update_mean = torch.assign(self.running_mean, mean)
+        update_variance = torch.assign(self.running_variance, variance)
+        update_norm_step = torch.assign(self.normalization_steps, steps)
+        return torch.group([update_mean, update_variance, update_norm_step])
 
 
 class SACPolicyNetwork(SACNetwork):
@@ -399,15 +399,15 @@ class SACPolicyNetwork(SACNetwork):
 
         if self.use_recurrent:
             mem_outs = [self.value_memory_out, self.q1_memory_out, self.q2_memory_out]
-            self.memory_out = pt.concat(mem_outs, axis=1)
+            self.memory_out = torch.concat(mem_outs, axis=1)
 
     def _create_memory_ins(self, m_size):
         """
         Creates the memory input placeholders for LSTM.
         :param m_size: the total size of the memory.
         """
-        self.memory_in = pt.placeholder(
-            shape=[None, m_size * 3], dtype=pt.float32, name="value_recurrent_in"
+        self.memory_in = torch.placeholder(
+            shape=[None, m_size * 3], dtype=torch.float32, name="value_recurrent_in"
         )
 
         # Re-break-up for each network
@@ -430,7 +430,7 @@ class SACPolicyNetwork(SACNetwork):
         :return A tuple of (hidden_policy, hidden_critic). We don't save it to self since they're used
         once and thrown away.
         """
-        with pt.variable_scope(POLICY_SCOPE):
+        with torch.variable_scope(POLICY_SCOPE):
             hidden_streams = ModelUtils.create_observation_streams(
                 self.policy.visual_in,
                 self.policy.processed_vector_in,

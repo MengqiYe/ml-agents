@@ -1,4 +1,4 @@
-from pt_mlagents.pt_utils import pt
+from pt_mlagents.pt_utils import torch
 
 from pt_mlagents.trainers.policy.pt_policy import PTPolicy
 
@@ -23,23 +23,23 @@ class BCModel(object):
         """
         Creates the input layers for the discriminator
         """
-        self.done_expert = pt.placeholder(shape=[None, 1], dtype=pt.float32)
-        self.done_policy = pt.placeholder(shape=[None, 1], dtype=pt.float32)
+        self.done_expert = torch.placeholder(shape=[None, 1], dtype=torch.float32)
+        self.done_policy = torch.placeholder(shape=[None, 1], dtype=torch.float32)
 
         if self.policy.behavior_spec.is_action_continuous():
             action_length = self.policy.act_size[0]
-            self.action_in_expert = pt.placeholder(
-                shape=[None, action_length], dtype=pt.float32
+            self.action_in_expert = torch.placeholder(
+                shape=[None, action_length], dtype=torch.float32
             )
-            self.expert_action = pt.identity(self.action_in_expert)
+            self.expert_action = torch.identity(self.action_in_expert)
         else:
             action_length = len(self.policy.act_size)
-            self.action_in_expert = pt.placeholder(
-                shape=[None, action_length], dtype=pt.int32
+            self.action_in_expert = torch.placeholder(
+                shape=[None, action_length], dtype=torch.int32
             )
-            self.expert_action = pt.concat(
+            self.expert_action = torch.concat(
                 [
-                    pt.one_hot(self.action_in_expert[:, i], act_size)
+                    torch.one_hot(self.action_in_expert[:, i], act_size)
                     for i, act_size in enumerate(self.policy.act_size)
                 ],
                 axis=1,
@@ -53,23 +53,23 @@ class BCModel(object):
         """
         selected_action = self.policy.output
         if self.policy.use_continuous_act:
-            self.loss = pt.reduce_mean(
-                pt.squared_difference(selected_action, self.expert_action)
+            self.loss = torch.reduce_mean(
+                torch.squared_difference(selected_action, self.expert_action)
             )
         else:
             log_probs = self.policy.all_log_probs
-            self.loss = pt.reduce_mean(
-                -pt.log(pt.nn.softmax(log_probs) + 1e-7) * self.expert_action
+            self.loss = torch.reduce_mean(
+                -torch.log(torch.nn.softmax(log_probs) + 1e-7) * self.expert_action
             )
 
         if anneal_steps > 0:
-            self.annealed_learning_rate = pt.train.polynomial_decay(
+            self.annealed_learning_rate = torch.train.polynomial_decay(
                 learning_rate, self.policy.global_step, anneal_steps, 0.0, power=1.0
             )
         else:
-            self.annealed_learning_rate = pt.Variable(learning_rate)
+            self.annealed_learning_rate = torch.Variable(learning_rate)
 
-        optimizer = pt.train.AdamOptimizer(
+        optimizer = torch.train.AdamOptimizer(
             learning_rate=self.annealed_learning_rate, name="bc_adam"
         )
         self.update_batch = optimizer.minimize(self.loss)

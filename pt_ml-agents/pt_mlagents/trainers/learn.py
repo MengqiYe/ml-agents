@@ -47,7 +47,7 @@ def get_version_string() -> str:
   ml-agents: {pt_mlagents.trainers.__version__},
   ml-agents-envs: {pt_mlagents_envs.__version__},
   Communicator API: {UnityEnvironment.API_VERSION},
-  TensorFlow: {pt_utils.pt.__version__}"""
+  TensorFlow: {pt_utils.torch.__version__}"""
 
 
 def parse_command_line(argv: Optional[List[str]] = None) -> RunOptions:
@@ -272,7 +272,7 @@ def run_cli(options: RunOptions) -> None:
     add_timer_metadata("pt_mlagents_version", pt_mlagents.trainers.__version__)
     add_timer_metadata("pt_mlagents_envs_version", pt_mlagents_envs.__version__)
     add_timer_metadata("communication_protocol_version", UnityEnvironment.API_VERSION)
-    add_timer_metadata("pytorch_version", pt_utils.pt.__version__)
+    add_timer_metadata("pytorch_version", pt_utils.torch.__version__)
 
     if options.env_settings.seed == -1:
         run_seed = np.random.randint(0, 10000)

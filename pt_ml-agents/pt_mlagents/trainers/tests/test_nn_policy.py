@@ -4,7 +4,7 @@ import unittest
 import tempfile
 
 import numpy as np
-from pt_mlagents.pt_utils import pt
+from pt_mlagents.pt_utils import torch
 
 
 from pt_mlagents.trainers.policy.nn_policy import NNPolicy
@@ -114,7 +114,7 @@ def _compare_two_policies(policy1: NNPolicy, policy2: NNPolicy) -> None:
 @pytest.mark.parametrize("rnn", [True, False], ids=["rnn", "no_rnn"])
 def test_policy_evaluate(rnn, visual, discrete):
     # Test evaluate
-    pt.reset_default_graph()
+    torch.reset_default_graph()
     policy = create_policy_mock(
         TrainerSettings(), use_rnn=rnn, use_discrete=discrete, use_visual=visual
     )
@@ -193,7 +193,7 @@ def test_min_visual_size():
     assert set(ModelUtils.MIN_RESOLUTION_FOR_ENCODER.keys()) == set(EncoderType)
 
     for encoder_type in EncoderType:
-        with pt.Graph().as_default():
+        with torch.Graph().as_default():
             good_size = ModelUtils.MIN_RESOLUTION_FOR_ENCODER[encoder_type]
             good_res = Tensor3DShape(width=good_size, height=good_size, num_channels=3)
             vis_input = ModelUtils.create_visual_input(good_res, "test_min_visual_size")
@@ -203,7 +203,7 @@ def test_min_visual_size():
 
         # Anything under the min size should raise an exception. If not, decrease the min size!
         with pytest.raises(Exception):
-            with pt.Graph().as_default():
+            with torch.Graph().as_default():
                 bad_size = ModelUtils.MIN_RESOLUTION_FOR_ENCODER[encoder_type] - 1
                 bad_res = Tensor3DShape(width=bad_size, height=bad_size, num_channels=3)
                 vis_input = ModelUtils.create_visual_input(

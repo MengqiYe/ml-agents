@@ -2,7 +2,7 @@ from unittest import mock
 import pytest
 
 import numpy as np
-from pt_mlagents.pt_utils import pt
+from pt_mlagents.pt_utils import torch
 import copy
 import attr
 
@@ -60,7 +60,7 @@ def _create_ppo_optimizer_ops_mock(dummy_config, use_rnn, use_discrete, use_visu
 @pytest.mark.parametrize("rnn", [True, False], ids=["rnn", "no_rnn"])
 def test_ppo_optimizer_update(dummy_config, rnn, visual, discrete):
     # Test evaluate
-    pt.reset_default_graph()
+    torch.reset_default_graph()
     optimizer = _create_ppo_optimizer_ops_mock(
         dummy_config, use_rnn=rnn, use_discrete=discrete, use_visual=visual
     )
@@ -86,7 +86,7 @@ def test_ppo_optimizer_update_curiosity(
     dummy_config, curiosity_dummy_config, rnn, visual, discrete  # noqa: F811
 ):
     # Test evaluate
-    pt.reset_default_graph()
+    torch.reset_default_graph()
     dummy_config.reward_signals = curiosity_dummy_config
     optimizer = _create_ppo_optimizer_ops_mock(
         dummy_config, use_rnn=rnn, use_discrete=discrete, use_visual=visual
@@ -110,7 +110,7 @@ def test_ppo_optimizer_update_curiosity(
 # We need to test this separately from test_reward_signals.py to ensure no interactions
 def test_ppo_optimizer_update_gail(gail_dummy_config, dummy_config):  # noqa: F811
     # Test evaluate
-    pt.reset_default_graph()
+    torch.reset_default_graph()
     dummy_config.reward_signals = gail_dummy_config
     optimizer = _create_ppo_optimizer_ops_mock(
         PPO_CONFIG, use_rnn=False, use_discrete=False, use_visual=False
@@ -148,7 +148,7 @@ def test_ppo_optimizer_update_gail(gail_dummy_config, dummy_config):  # noqa: F8
 @pytest.mark.parametrize("visual", [True, False], ids=["visual", "vector"])
 @pytest.mark.parametrize("rnn", [True, False], ids=["rnn", "no_rnn"])
 def test_ppo_get_value_estimates(dummy_config, rnn, visual, discrete):
-    pt.reset_default_graph()
+    torch.reset_default_graph()
 
     optimizer = _create_ppo_optimizer_ops_mock(
         dummy_config, use_rnn=rnn, use_discrete=discrete, use_visual=visual

@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock, patch
 import pytest
 
-from pt_mlagents.pt_utils import pt
+from pt_mlagents.pt_utils import torch
 from pt_mlagents.trainers.trainer_controller import TrainerController
 from pt_mlagents.trainers.environment_parameter_manager import EnvironmentParameterManager
 from pt_mlagents.trainers.ghost.controller import GhostController

@@ -4,7 +4,7 @@ import os
 import numpy as np
 from distutils.version import LooseVersion
 
-from pt_mlagents.pt_utils import pt
+from pt_mlagents.pt_utils import torch
 from pt_mlagents import pt_utils
 from pt_mlagents_envs.exception import UnityException
 from pt_mlagents_envs.base_env import BehaviorSpec
@@ -62,11 +62,11 @@ class PTPolicy(Policy):
         self.trainer_settings = trainer_settings
         self.network_settings: NetworkSettings = trainer_settings.network_settings
         # for ghost trainer save/load snapshots
-        self.assign_phs: List[pt.Tensor] = []
-        self.assign_ops: List[pt.Operation] = []
+        self.assign_phs: List[torch.Tensor] = []
+        self.assign_ops: List[torch.Operation] = []
 
-        self.inference_dict: Dict[str, pt.Tensor] = {}
-        self.update_dict: Dict[str, pt.Tensor] = {}
+        self.inference_dict: Dict[str, torch.Tensor] = {}
+        self.update_dict: Dict[str, torch.Tensor] = {}
         self.sequence_length = 1
         self.seed = seed
         self.behavior_spec = behavior_spec
@@ -92,11 +92,11 @@ class PTPolicy(Policy):
         self.model_path = model_path
         self.initialize_path = self.trainer_settings.init_path
         self.keep_checkpoints = self.trainer_settings.keep_checkpoints
-        self.graph = pt.Graph()
-        self.sess = pt.Session(
-            config=pt_utils.generate_session_config(), graph=self.graph
-        )
-        self.saver: Optional[pt.Operation] = None
+        self.graph = torch.Graph()
+        # self.sess = torch.Session(
+        #     config=pt_utils.generate_session_config(), graph=self.graph
+        # )
+        self.saver: Optional[torch.Operation] = None
         self.seed = seed
         if self.network_settings.memory is not None:
             self.m_size = self.network_settings.memory.memory_size
@@ -105,7 +105,7 @@ class PTPolicy(Policy):
         self.load = load
 
     @abc.abstractmethod
-    def get_trainable_variables(self) -> List[pt.Tensor]:
+    def get_trainable_variables(self) -> List[torch.Tensor]:
         """
         Returns a List of the trainable variables in this policy. if create_pt_graph hasn't been called,
         returns empty list.
@@ -147,15 +147,15 @@ class PTPolicy(Policy):
 
     def _initialize_graph(self):
         with self.graph.as_default():
-            self.saver = pt.train.Saver(max_to_keep=self.keep_checkpoints)
-            init = pt.global_variables_initializer()
+            self.saver = torch.train.Saver(max_to_keep=self.keep_checkpoints)
+            init = torch.global_variables_initializer()
             self.sess.run(init)
 
     def _load_graph(self, model_path: str, reset_global_steps: bool = False) -> None:
         with self.graph.as_default():
-            self.saver = pt.train.Saver(max_to_keep=self.keep_checkpoints)
+            self.saver = torch.train.Saver(max_to_keep=self.keep_checkpoints)
             logger.info(f"Loading model from {model_path}.")
-            ckpt = pt.train.get_checkpoint_state(model_path)
+            ckpt = torch.train.get_checkpoint_state(model_path)
             if ckpt is None:
                 raise UnityPolicyException(
                     "The model {0} could not be loaded. Make "
@@ -164,8 +164,8 @@ class PTPolicy(Policy):
                     "behavior names.".format(model_path)
                 )
             try:
-                self.saver.restore(self.sess, ckpt.model_checkpoint_path)
-            except pt.errors.NotFoundError:
+                self.saver.restore(self.sess, cktorch.model_checkpoint_path)
+            except torch.errors.NotFoundError:
                 raise UnityPolicyException(
                     "The model {0} was found but could not be loaded. Make "
                     "sure the model is from the same version of ML-Agents, has the same behavior parameters, "
@@ -200,18 +200,18 @@ class PTPolicy(Policy):
 
     def get_weights(self):
         with self.graph.as_default():
-            _vars = pt.get_collection(pt.GraphKeys.GLOBAL_VARIABLES)
+            _vars = torch.get_collection(torch.GraphKeys.GLOBAL_VARIABLES)
             values = [v.eval(session=self.sess) for v in _vars]
             return values
 
     def init_load_weights(self):
         with self.graph.as_default():
-            _vars = pt.get_collection(pt.GraphKeys.GLOBAL_VARIABLES)
+            _vars = torch.get_collection(torch.GraphKeys.GLOBAL_VARIABLES)
             values = [v.eval(session=self.sess) for v in _vars]
             for var, value in zip(_vars, values):
-                assign_ph = pt.placeholder(var.dtype, shape=value.shape)
+                assign_ph = torch.placeholder(var.dtype, shape=value.shape)
                 self.assign_phs.append(assign_ph)
-                self.assign_ops.append(pt.assign(var, assign_ph))
+                self.assign_ops.append(torch.assign(var, assign_ph))
 
     def load_weights(self, values):
         if len(self.assign_ops) == 0:
@@ -410,7 +410,7 @@ class PTPolicy(Policy):
         with self.graph.as_default():
             last_checkpoint = os.path.join(self.model_path, f"model-{steps}.ckpt")
             self.saver.save(self.sess, last_checkpoint)
-            pt.train.write_graph(
+            torch.train.write_graph(
                 self.graph, self.model_path, "raw_graph_def.pb", as_text=False
             )
 
@@ -433,111 +433,111 @@ class PTPolicy(Policy):
         return self.vec_obs_size > 0
 
     def _initialize_tensorflow_references(self):
-        self.value_heads: Dict[str, pt.Tensor] = {}
-        self.normalization_steps: Optional[pt.Variable] = None
-        self.running_mean: Optional[pt.Variable] = None
-        self.running_variance: Optional[pt.Variable] = None
-        self.update_normalization_op: Optional[pt.Operation] = None
-        self.value: Optional[pt.Tensor] = None
-        self.all_log_probs: pt.Tensor = None
-        self.total_log_probs: Optional[pt.Tensor] = None
-        self.entropy: Optional[pt.Tensor] = None
-        self.output_pre: Optional[pt.Tensor] = None
-        self.output: Optional[pt.Tensor] = None
-        self.selected_actions: pt.Tensor = None
-        self.action_masks: Optional[pt.Tensor] = None
-        self.prev_action: Optional[pt.Tensor] = None
-        self.memory_in: Optional[pt.Tensor] = None
-        self.memory_out: Optional[pt.Tensor] = None
-        self.version_tensors: Optional[Tuple[pt.Tensor, pt.Tensor, pt.Tensor]] = None
+        self.value_heads: Dict[str, torch.Tensor] = {}
+        self.normalization_steps: Optional[torch.Variable] = None
+        self.running_mean: Optional[torch.Variable] = None
+        self.running_variance: Optional[torch.Variable] = None
+        self.update_normalization_op: Optional[torch.Operation] = None
+        self.value: Optional[torch.Tensor] = None
+        self.all_log_probs: torch.Tensor = None
+        self.total_log_probs: Optional[torch.Tensor] = None
+        self.entropy: Optional[torch.Tensor] = None
+        self.output_pre: Optional[torch.Tensor] = None
+        self.output: Optional[torch.Tensor] = None
+        self.selected_actions: torch.Tensor = None
+        self.action_masks: Optional[torch.Tensor] = None
+        self.prev_action: Optional[torch.Tensor] = None
+        self.memory_in: Optional[torch.Tensor] = None
+        self.memory_out: Optional[torch.Tensor] = None
+        self.version_tensors: Optional[Tuple[torch.Tensor, torch.Tensor, torch.Tensor]] = None
 
     def create_input_placeholders(self):
-        with self.graph.as_default():
-            (
-                self.global_step,
-                self.increment_step_op,
-                self.steps_to_increment,
-            ) = ModelUtils.create_global_steps()
-            self.vector_in, self.visual_in = ModelUtils.create_input_placeholders(
-                self.behavior_spec.observation_shapes
+        # with self.graph.as_default():
+        (
+            self.global_step,
+            self.increment_step_op,
+            self.steps_to_increment,
+        ) = ModelUtils.create_global_steps()
+        self.vector_in, self.visual_in = ModelUtils.create_input_placeholders(
+            self.behavior_spec.observation_shapes
+        )
+        if self.normalize:
+            normalization_tensors = ModelUtils.create_normalizer(self.vector_in)
+            self.update_normalization_op = normalization_tensors.update_op
+            self.normalization_steps = normalization_tensors.steps
+            self.running_mean = normalization_tensors.running_mean
+            self.running_variance = normalization_tensors.running_variance
+            self.processed_vector_in = ModelUtils.normalize_vector_obs(
+                self.vector_in,
+                self.running_mean,
+                self.running_variance,
+                self.normalization_steps,
             )
-            if self.normalize:
-                normalization_tensors = ModelUtils.create_normalizer(self.vector_in)
-                self.update_normalization_op = normalization_tensors.update_op
-                self.normalization_steps = normalization_tensors.steps
-                self.running_mean = normalization_tensors.running_mean
-                self.running_variance = normalization_tensors.running_variance
-                self.processed_vector_in = ModelUtils.normalize_vector_obs(
-                    self.vector_in,
-                    self.running_mean,
-                    self.running_variance,
-                    self.normalization_steps,
-                )
-            else:
-                self.processed_vector_in = self.vector_in
-                self.update_normalization_op = None
+        else:
+            self.processed_vector_in = self.vector_in
+            self.update_normalization_op = None
 
-            self.batch_size_ph = pt.placeholder(
-                shape=None, dtype=pt.int32, name="batch_size"
-            )
-            self.sequence_length_ph = pt.placeholder(
-                shape=None, dtype=pt.int32, name="sequence_length"
-            )
-            self.mask_input = pt.placeholder(
-                shape=[None], dtype=pt.float32, name="masks"
-            )
-            # Only needed for PPO, but needed for BC module
-            self.epsilon = pt.placeholder(
-                shape=[None, self.act_size[0]], dtype=pt.float32, name="epsilon"
-            )
-            self.mask = pt.cast(self.mask_input, pt.int32)
+        self.batch_size_ph = torch.placeholder(
+            shape=None, dtype=torch.int32, name="batch_size"
+        )
+        self.sequence_length_ph = torch.placeholder(
+            shape=None, dtype=torch.int32, name="sequence_length"
+        )
+        self.mask_input = torch.placeholder(
+            shape=[None], dtype=torch.float32, name="masks"
+        )
+        # Only needed for PPO, but needed for BC module
+        self.epsilon = torch.placeholder(
+            shape=[None, self.act_size[0]], dtype=torch.float32, name="epsilon"
+        )
+        self.mask = torch.cast(self.mask_input, torch.int32)
 
-            pt.Variable(
-                int(self.behavior_spec.is_action_continuous()),
-                name="is_continuous_control",
+        torch.Variable(
+            int(self.behavior_spec.is_action_continuous()),
+            name="is_continuous_control",
+            trainable=False,
+            dtype=torch.int32,
+        )
+        int_version = PTPolicy._convert_version_string(__version__)
+        major_ver_t = torch.Variable(
+            int_version[0],
+            name="trainer_major_version",
+            trainable=False,
+            dtype=torch.int32,
+        )
+        minor_ver_t = torch.Variable(
+            int_version[1],
+            name="trainer_minor_version",
+            trainable=False,
+            dtype=torch.int32,
+        )
+        patch_ver_t = torch.Variable(
+            int_version[2],
+            name="trainer_patch_version",
+            trainable=False,
+            dtype=torch.int32,
+        )
+        self.version_tensors = (major_ver_t, minor_ver_t, patch_ver_t)
+        torch.Variable(
+            MODEL_FORMAT_VERSION,
+            name="version_number",
+            trainable=False,
+            dtype=torch.int32,
+        )
+        torch.Variable(
+            self.m_size, name="memory_size", trainable=False, dtype=torch.int32
+        )
+        if self.behavior_spec.is_action_continuous():
+            torch.Variable(
+                self.act_size[0],
+                name="action_output_shape",
                 trainable=False,
-                dtype=pt.int32,
+                dtype=torch.int32,
             )
-            int_version = PTPolicy._convert_version_string(__version__)
-            major_ver_t = pt.Variable(
-                int_version[0],
-                name="trainer_major_version",
+        else:
+            torch.Variable(
+                sum(self.act_size),
+                name="action_output_shape",
                 trainable=False,
-                dtype=pt.int32,
+                dtype=torch.int32,
             )
-            minor_ver_t = pt.Variable(
-                int_version[1],
-                name="trainer_minor_version",
-                trainable=False,
-                dtype=pt.int32,
-            )
-            patch_ver_t = pt.Variable(
-                int_version[2],
-                name="trainer_patch_version",
-                trainable=False,
-                dtype=pt.int32,
-            )
-            self.version_tensors = (major_ver_t, minor_ver_t, patch_ver_t)
-            pt.Variable(
-                MODEL_FORMAT_VERSION,
-                name="version_number",
-                trainable=False,
-                dtype=pt.int32,
-            )
-            pt.Variable(
-                self.m_size, name="memory_size", trainable=False, dtype=pt.int32
-            )
-            if self.behavior_spec.is_action_continuous():
-                pt.Variable(
-                    self.act_size[0],
-                    name="action_output_shape",
-                    trainable=False,
-                    dtype=pt.int32,
-                )
-            else:
-                pt.Variable(
-                    sum(self.act_size),
-                    name="action_output_shape",
-                    trainable=False,
-                    dtype=pt.int32,
-                )

@@ -8,7 +8,7 @@ from typing import Dict, Set, List
 from collections import defaultdict
 
 import numpy as np
-from pt_mlagents.pt_utils import pt
+from pt_mlagents.pt_utils import torch
 
 from pt_mlagents_envs.logging_util import get_logger
 from pt_mlagents.trainers.env_manager import EnvManager
@@ -63,7 +63,7 @@ class TrainerController(object):
         self.trainer_threads: List[threading.Thread] = []
         self.kill_trainers = False
         np.random.seed(training_seed)
-        pt.set_random_seed(training_seed)
+        torch.random.manual_seed(training_seed)
 
     @timed
     def _save_model(self):
@@ -170,7 +170,7 @@ class TrainerController(object):
     @timed
     def start_learning(self, env_manager: EnvManager) -> None:
         self._create_output_path(self.output_path)
-        pt.reset_default_graph()
+        # FIXME: torch.reset_default_graph()
         last_brain_behavior_ids: Set[str] = set()
         try:
             # Initial reset

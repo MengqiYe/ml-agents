@@ -1,7 +1,7 @@
 from typing import Dict, Any, List, Tuple, Optional
 import numpy as np
 
-from pt_mlagents.pt_utils.pt import pt
+from pt_mlagents.pt_utils.pt import torch
 from pt_mlagents.trainers.buffer import AgentBuffer
 from pt_mlagents.trainers.policy.pt_policy import PTPolicy
 from pt_mlagents.trainers.optimizer import Optimizer
@@ -17,11 +17,11 @@ class PTOptimizer(Optimizer):  # pylint: disable=W0223
     def __init__(self, policy: PTPolicy, trainer_params: TrainerSettings):
         self.sess = policy.sess
         self.policy = policy
-        self.update_dict: Dict[str, pt.Tensor] = {}
-        self.value_heads: Dict[str, pt.Tensor] = {}
+        self.update_dict: Dict[str, torch.Tensor] = {}
+        self.value_heads: Dict[str, torch.Tensor] = {}
         self.create_reward_signals(trainer_params.reward_signals)
-        self.memory_in: pt.Tensor = None
-        self.memory_out: pt.Tensor = None
+        self.memory_in: torch.Tensor = None
+        self.memory_out: torch.Tensor = None
         self.m_size: int = 0
         self.bc_module: Optional[BCModule] = None
         # Create pretrainer if needed
@@ -37,7 +37,7 @@ class PTOptimizer(Optimizer):  # pylint: disable=W0223
     def get_trajectory_value_estimates(
         self, batch: AgentBuffer, next_obs: List[np.ndarray], done: bool
     ) -> Tuple[Dict[str, np.ndarray], Dict[str, float]]:
-        feed_dict: Dict[pt.Tensor, Any] = {
+        feed_dict: Dict[torch.Tensor, Any] = {
             self.policy.batch_size_ph: batch.num_experiences,
             self.policy.sequence_length_ph: batch.num_experiences,  # We want to feed data in batch-wise, not time-wise.
         }
@@ -94,7 +94,7 @@ class PTOptimizer(Optimizer):  # pylint: disable=W0223
         corresponding value estimate.
         """
 
-        feed_dict: Dict[pt.Tensor, Any] = {
+        feed_dict: Dict[torch.Tensor, Any] = {
             self.policy.batch_size_ph: 1,
             self.policy.sequence_length_ph: 1,
         }
@@ -141,12 +141,12 @@ class PTOptimizer(Optimizer):  # pylint: disable=W0223
             )
 
     def create_optimizer_op(
-        self, learning_rate: pt.Tensor, name: str = "Adam"
-    ) -> None: # pt.train.Optimizer:
-        return pt.train.AdamOptimizer(learning_rate=learning_rate, name=name)
+        self, learning_rate: torch.Tensor, name: str = "Adam"
+    ) -> None: # torch.train.Optimizer:
+        return torch.train.AdamOptimizer(learning_rate=learning_rate, name=name)
 
     def _execute_model(
-        self, feed_dict: Dict[pt.Tensor, np.ndarray], out_dict: Dict[str, pt.Tensor]
+        self, feed_dict: Dict[torch.Tensor, np.ndarray], out_dict: Dict[str, torch.Tensor]
     ) -> Dict[str, np.ndarray]:
         """
         Executes model.

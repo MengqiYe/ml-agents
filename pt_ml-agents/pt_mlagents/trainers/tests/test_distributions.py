@@ -1,6 +1,6 @@
 import pytest
 
-from pt_mlagents.pt_utils import pt
+from pt_mlagents.pt_utils import torch
 
 from pt_mlagents.trainers.distributions import (
     GaussianDistribution,
@@ -16,17 +16,17 @@ NUM_AGENTS = 12
 
 
 def test_gaussian_distribution():
-    with pt.Graph().as_default():
-        logits = pt.Variable(initial_value=[[1, 1]], trainable=True, dtype=pt.float32)
+    with torch.Graph().as_default():
+        logits = torch.Variable(initial_value=[[1, 1]], trainable=True, dtype=torch.float32)
         distribution = GaussianDistribution(
             logits,
             act_size=VECTOR_ACTION_SPACE,
             reparameterize=False,
             tanh_squash=False,
         )
-        sess = pt.Session()
-        with pt.Session() as sess:
-            init = pt.global_variables_initializer()
+        sess = torch.Session()
+        with torch.Session() as sess:
+            init = torch.global_variables_initializer()
             sess.run(init)
             output = sess.run(distribution.sample)
             for _ in range(10):
@@ -36,7 +36,7 @@ def test_gaussian_distribution():
                 output = sess.run([distribution.total_log_probs])
                 assert output[0].shape[0] == 1
             # Test entropy is correct
-            log_std_tensor = pt.get_default_graph().get_tensor_by_name(
+            log_std_tensor = torch.get_default_graph().get_tensor_by_name(
                 "log_std/BiasAdd:0"
             )
             feed_dict = {log_std_tensor: [[1.0, 1.0]]}
@@ -46,14 +46,14 @@ def test_gaussian_distribution():
 
 
 def test_tanh_distribution():
-    with pt.Graph().as_default():
-        logits = pt.Variable(initial_value=[[0, 0]], trainable=True, dtype=pt.float32)
+    with torch.Graph().as_default():
+        logits = torch.Variable(initial_value=[[0, 0]], trainable=True, dtype=torch.float32)
         distribution = GaussianDistribution(
             logits, act_size=VECTOR_ACTION_SPACE, reparameterize=False, tanh_squash=True
         )
-        sess = pt.Session()
-        with pt.Session() as sess:
-            init = pt.global_variables_initializer()
+        sess = torch.Session()
+        with torch.Session() as sess:
+            init = torch.global_variables_initializer()
             sess.run(init)
             output = sess.run(distribution.sample)
             for _ in range(10):
@@ -69,19 +69,19 @@ def test_tanh_distribution():
 
 
 def test_multicategorical_distribution():
-    with pt.Graph().as_default():
-        logits = pt.Variable(initial_value=[[0, 0]], trainable=True, dtype=pt.float32)
-        action_masks = pt.Variable(
+    with torch.Graph().as_default():
+        logits = torch.Variable(initial_value=[[0, 0]], trainable=True, dtype=torch.float32)
+        action_masks = torch.Variable(
             initial_value=[[1 for _ in range(sum(DISCRETE_ACTION_SPACE))]],
             trainable=True,
-            dtype=pt.float32,
+            dtype=torch.float32,
         )
         distribution = MultiCategoricalDistribution(
             logits, act_size=DISCRETE_ACTION_SPACE, action_masks=action_masks
         )
-        sess = pt.Session()
-        with pt.Session() as sess:
-            init = pt.global_variables_initializer()
+        sess = torch.Session()
+        with torch.Session() as sess:
+            init = torch.global_variables_initializer()
             sess.run(init)
             output = sess.run(distribution.sample)
             for _ in range(10):

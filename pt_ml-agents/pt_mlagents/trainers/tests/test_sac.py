@@ -2,7 +2,7 @@ import pytest
 from unittest import mock
 import copy
 
-from pt_mlagents.pt_utils import pt
+from pt_mlagents.pt_utils import torch
 
 
 from pt_mlagents.trainers.sac.trainer import SACTrainer
@@ -58,7 +58,7 @@ def create_sac_optimizer_mock(dummy_config, use_rnn, use_discrete, use_visual):
 @pytest.mark.parametrize("rnn", [True, False], ids=["rnn", "no_rnn"])
 def test_sac_optimizer_update(dummy_config, rnn, visual, discrete):
     # Test evaluate
-    pt.reset_default_graph()
+    torch.reset_default_graph()
     optimizer = create_sac_optimizer_mock(
         dummy_config, use_rnn=rnn, use_discrete=discrete, use_visual=visual
     )
@@ -79,7 +79,7 @@ def test_sac_update_reward_signals(
     dummy_config, curiosity_dummy_config, discrete  # noqa: F811
 ):
     # Test evaluate
-    pt.reset_default_graph()
+    torch.reset_default_graph()
     # Add a Curiosity module
     dummy_config.reward_signals = curiosity_dummy_config
     optimizer = create_sac_optimizer_mock(

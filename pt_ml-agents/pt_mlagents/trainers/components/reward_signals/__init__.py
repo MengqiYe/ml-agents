@@ -3,7 +3,7 @@ from collections import namedtuple
 import numpy as np
 import abc
 
-from pt_mlagents.pt_utils import pt
+from pt_mlagents.pt_utils import torch
 
 from pt_mlagents_envs.logging_util import get_logger
 from pt_mlagents.trainers.policy.pt_policy import PTPolicy
@@ -34,7 +34,7 @@ class RewardSignal(abc.ABC):
         # Terminate discounted reward computation at Done. Can disable to mitigate positive bias in rewards with
         # no natural end, e.g. GAIL or Curiosity
         self.use_terminal_states = True
-        self.update_dict: Dict[str, pt.Tensor] = {}
+        self.update_dict: Dict[str, torch.Tensor] = {}
         self.gamma = settings.gamma
         self.policy = policy
         self.strength = settings.strength
@@ -56,7 +56,7 @@ class RewardSignal(abc.ABC):
 
     def prepare_update(
         self, policy: PTPolicy, mini_batch: AgentBuffer, num_sequences: int
-    ) -> Dict[pt.Tensor, Any]:
+    ) -> Dict[torch.Tensor, Any]:
         """
         If the reward signal has an internal model (e.g. GAIL or Curiosity), get the feed_dict
         needed to update the buffer..

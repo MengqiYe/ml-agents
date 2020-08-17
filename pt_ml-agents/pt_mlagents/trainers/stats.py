@@ -12,7 +12,8 @@ from pt_mlagents_envs.logging_util import get_logger
 from pt_mlagents_envs.timers import set_gauge
 from pt_mlagents.pt_utils import pt, generate_session_config
 
-from tensorboardX import SummaryWriter, FileWriter
+# from tensorboardX import SummaryWriter, FileWriter
+from torch.utils.tensorboard import SummaryWriter, FileWriter
 
 logger = get_logger(__name__)
 
@@ -168,7 +169,7 @@ class TensorboardWriter(StatsWriter):
         :param clear_past_data: Whether or not to clean up existing Tensorboard files associated with the base_dir and
             category.
         """
-        self.summary_writers: Dict[str, pt.summary.FileWriter] = {}
+        self.summary_writers: Dict[str, torch.summary.FileWriter] = {}
         self.base_dir: str = base_dir
         self._clear_past_data = clear_past_data
 
@@ -226,10 +227,10 @@ class TensorboardWriter(StatsWriter):
         :param input_dict: A dictionary that will be displayed in a table on Tensorboard.
         """
         try:
-            with pt.Session(config=generate_session_config()) as sess:
-                s_op = pt.summary.text(
+            with torch.Session(config=generate_session_config()) as sess:
+                s_op = torch.summary.text(
                     name,
-                    pt.convert_to_tensor(
+                    torch.convert_to_tensor(
                         ([[str(x), str(input_dict[x])] for x in input_dict])
                     ),
                 )

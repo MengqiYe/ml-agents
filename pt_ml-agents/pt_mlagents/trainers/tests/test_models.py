@@ -1,7 +1,7 @@
 import pytest
 
 from pt_mlagents.trainers.models import ModelUtils
-from pt_mlagents.pt_utils import pt
+from pt_mlagents.pt_utils import torch
 from pt_mlagents_envs.base_env import BehaviorSpec, ActionType
 
 
@@ -26,7 +26,7 @@ def test_create_input_placeholders(num_vector, num_visual):
 
     assert isinstance(vis_in, list)
     assert len(vis_in) == num_visual
-    assert isinstance(vec_in, pt.Tensor)
+    assert isinstance(vec_in, torch.Tensor)
     assert vec_in.get_shape().as_list()[1] == num_vector * 8
 
     # Check names contain prefix and vis shapes are correct

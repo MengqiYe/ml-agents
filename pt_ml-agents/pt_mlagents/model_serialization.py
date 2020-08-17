@@ -13,7 +13,7 @@ except ImportError:
     ONNX_EXPORT_ENABLED = False
     pass
 
-from pt_mlagents.pt_utils import pt
+from pt_mlagents.pt_utils import torch
 
 from tensorflow.python.platform import gfile
 from tensorflow.python.framework import graph_util
@@ -21,7 +21,7 @@ from tensorflow.python.framework import graph_util
 from pt_mlagents_envs.logging_util import get_logger
 from pt_mlagents.trainers import tensorflow_to_barracuda as tf2bc
 
-if LooseVersion(pt.__version__) < LooseVersion("1.12.0"):
+if LooseVersion(torch.__version__) < LooseVersion("1.12.0"):
     # ONNX is only tested on 1.12.0 and later
     ONNX_EXPORT_ENABLED = False
 
@@ -66,7 +66,7 @@ class SerializationSettings(NamedTuple):
 
 
 def export_policy_model(
-    settings: SerializationSettings, graph: pt.Graph,# sess: pt.Session
+    settings: SerializationSettings, graph: torch.Graph,# sess: torch.Session
 ) -> None:
     """
     Exports latest saved model to .nn format for Unity embedding.
@@ -109,8 +109,8 @@ def export_policy_model(
 
 
 def _make_frozen_graph(
-    settings: SerializationSettings, graph: pt.Graph,# sess: pt.Session
-) -> None: # pt.GraphDef:
+    settings: SerializationSettings, graph: torch.Graph,# sess: torch.Session
+) -> None: # torch.GraphDef:
     with graph.as_default():
         target_nodes = ",".join(_process_graph(settings, graph))
         graph_def = graph.as_graph_def()
@@ -121,7 +121,7 @@ def _make_frozen_graph(
 
 
 def convert_frozen_to_onnx(
-    settings: SerializationSettings, frozen_graph_def: None # pt.GraphDef
+    settings: SerializationSettings, frozen_graph_def: None # torch.GraphDef
 ) -> Any:
     # This is basically https://github.com/onnx/tensorflow-onnx/blob/master/tf2onnx/convert.py
 
@@ -133,9 +133,9 @@ def convert_frozen_to_onnx(
         inputs, outputs, frozen_graph_def, fold_constant=True
     )
 
-    with pt.Graph().as_default() as pt_graph:
-        pt.import_graph_def(frozen_graph_def, name="")
-    with pt.Session(graph=pt_graph):
+    with torch.Graph().as_default() as pt_graph:
+        torch.import_graph_def(frozen_graph_def, name="")
+    with torch.Session(graph=pt_graph):
         g = process_pt_graph(
             pt_graph,
             input_names=inputs,
@@ -193,7 +193,7 @@ def _get_frozen_graph_node_names(frozen_graph_def: Any) -> Set[str]:
     return names
 
 
-def _process_graph(settings: SerializationSettings, graph: pt.Graph) -> List[str]:
+def _process_graph(settings: SerializationSettings, graph: torch.Graph) -> List[str]:
     """
     Gets the list of the output nodes present in the graph for inference
     :return: list of node names

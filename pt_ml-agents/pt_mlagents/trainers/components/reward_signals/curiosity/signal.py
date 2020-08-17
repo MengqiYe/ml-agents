@@ -1,6 +1,6 @@
 from typing import Any, Dict
 import numpy as np
-from pt_mlagents.pt_utils import pt
+from pt_mlagents.pt_utils import torch
 
 from pt_mlagents.trainers.components.reward_signals import RewardSignal, RewardSignalResult
 from pt_mlagents.trainers.components.reward_signals.curiosity.model import CuriosityModel
@@ -36,7 +36,7 @@ class CuriosityRewardSignal(RewardSignal):
         self.has_updated = False
 
     def evaluate_batch(self, mini_batch: AgentBuffer) -> RewardSignalResult:
-        feed_dict: Dict[pt.Tensor, Any] = {
+        feed_dict: Dict[torch.Tensor, Any] = {
             self.policy.batch_size_ph: len(mini_batch["actions"]),
             self.policy.sequence_length_ph: self.policy.sequence_length,
         }
@@ -64,7 +64,7 @@ class CuriosityRewardSignal(RewardSignal):
 
     def prepare_update(
         self, policy: PTPolicy, mini_batch: AgentBuffer, num_sequences: int
-    ) -> Dict[pt.Tensor, Any]:
+    ) -> Dict[torch.Tensor, Any]:
         """
         Prepare for update and get feed_dict.
         :param num_sequences: Number of trajectories in batch.

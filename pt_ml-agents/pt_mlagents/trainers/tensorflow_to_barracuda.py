@@ -3,7 +3,7 @@
 from __future__ import print_function
 import numpy as np
 import struct  # convert from Python values and C structs
-from pt_mlagents.pt_utils import pt
+from pt_mlagents.pt_utils import torch
 import re
 
 # import barracuda
@@ -616,7 +616,7 @@ def get_attr(node, attr_name, default=None):
 def get_epsilon(layer):
     return get_attr(
         layer, "epsilon", default=0.001
-    )  # default epsilon taken from pt.layers.batch_normalization
+    )  # default epsilon taken from torch.layers.batch_normalization
 
 
 def get_layer_rank(layer):
@@ -1545,7 +1545,7 @@ def convert(
     # Load Tensorflow model
     print("Converting %s to %s" % (source_file, target_file))
     f = open(source_file, "rb")
-    i_model = pt.GraphDef()
+    i_model = torch.GraphDef()
     i_model.ParseFromString(f.read())
 
     if args.verbose:

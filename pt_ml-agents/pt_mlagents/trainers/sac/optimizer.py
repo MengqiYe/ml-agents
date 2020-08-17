@@ -1,7 +1,7 @@
 import numpy as np
 from typing import Dict, List, Optional, Any, Mapping, cast
 
-from pt_mlagents.pt_utils import pt
+from pt_mlagents.pt_utils import torch
 
 from pt_mlagents_envs.logging_util import get_logger
 from pt_mlagents.trainers.sac.network import SACPolicyNetwork, SACTargetNetwork
@@ -43,7 +43,7 @@ class SACOptimizer(PTOptimizer):
         policy.create_pt_graph()
 
         with policy.graph.as_default():
-            with pt.variable_scope(""):
+            with torch.variable_scope(""):
                 super().__init__(policy, trainer_params)
                 hyperparameters: SACSettings = cast(
                     SACSettings, trainer_params.hyperparameters
@@ -76,7 +76,7 @@ class SACOptimizer(PTOptimizer):
                     _val.gamma for _val in trainer_params.reward_signals.values()
                 ]
                 self.use_dones_in_backup = {
-                    name: pt.Variable(1.0) for name in stream_names
+                    name: torch.Variable(1.0) for name in stream_names
                 }
                 self.disable_use_dones = {
                     name: self.use_dones_in_backup[name].assign(0.0)
@@ -86,11 +86,11 @@ class SACOptimizer(PTOptimizer):
                 if num_layers < 1:
                     num_layers = 1
 
-                self.target_init_op: List[pt.Tensor] = []
-                self.target_update_op: List[pt.Tensor] = []
-                self.update_batch_policy: Optional[pt.Operation] = None
-                self.update_batch_value: Optional[pt.Operation] = None
-                self.update_batch_entropy: Optional[pt.Operation] = None
+                self.target_init_op: List[torch.Tensor] = []
+                self.target_update_op: List[torch.Tensor] = []
+                self.update_batch_policy: Optional[torch.Operation] = None
+                self.update_batch_value: Optional[torch.Operation] = None
+                self.update_batch_entropy: Optional[torch.Operation] = None
 
                 self.policy_network = SACPolicyNetwork(
                     policy=self.policy,
@@ -142,7 +142,7 @@ class SACOptimizer(PTOptimizer):
                         self.policy.normalization_steps,
                     )
                     # Update the normalization of the optimizer when the policy does.
-                    self.policy.update_normalization_op = pt.group(
+                    self.policy.update_normalization_op = torch.group(
                         [self.policy.update_normalization_op, target_update_norm]
                     )
 
@@ -186,12 +186,12 @@ class SACOptimizer(PTOptimizer):
             self.output_pre = self.policy_network.output_pre
 
         # Don't use value estimate during inference.
-        self.value = pt.identity(
+        self.value = torch.identity(
             self.policy_network.value, name="value_estimate_unused"
         )
         self.value_heads = self.policy_network.value_heads
-        self.dones_holder = pt.placeholder(
-            shape=[None], dtype=pt.float32, name="dones_holder"
+        self.dones_holder = torch.placeholder(
+            shape=[None], dtype=torch.float32, name="dones_holder"
         )
 
         if self.policy.use_recurrent:
@@ -203,9 +203,9 @@ class SACOptimizer(PTOptimizer):
 
     def _create_losses(
         self,
-        q1_streams: Dict[str, pt.Tensor],
-        q2_streams: Dict[str, pt.Tensor],
-        lr: pt.Tensor,
+        q1_streams: Dict[str, torch.Tensor],
+        q2_streams: Dict[str, torch.Tensor],
+        lr: torch.Tensor,
         max_step: int,
         stream_names: List[str],
         discrete: bool = False,
@@ -225,7 +225,7 @@ class SACOptimizer(PTOptimizer):
                 self.discrete_target_entropy_scale * np.log(i).astype(np.float32)
                 for i in self.act_size
             ]
-            discrete_action_probs = pt.exp(self.policy.all_log_probs)
+            discrete_action_probs = torch.exp(self.policy.all_log_probs)
             per_action_entropy = discrete_action_probs * self.policy.all_log_probs
         else:
             self.target_entropy = (
@@ -243,46 +243,46 @@ class SACOptimizer(PTOptimizer):
                     self.policy_network.q1_pheads[name] * discrete_action_probs,
                     self.act_size,
                 )
-                branched_mpq1 = pt.stack(
+                branched_mpq1 = torch.stack(
                     [
-                        pt.reduce_sum(_br, axis=1, keep_dims=True)
+                        torch.reduce_sum(_br, axis=1, keep_dims=True)
                         for _br in _branched_mpq1
                     ]
                 )
-                _q1_p_mean = pt.reduce_mean(branched_mpq1, axis=0)
+                _q1_p_mean = torch.reduce_mean(branched_mpq1, axis=0)
 
                 _branched_mpq2 = ModelUtils.break_into_branches(
                     self.policy_network.q2_pheads[name] * discrete_action_probs,
                     self.act_size,
                 )
-                branched_mpq2 = pt.stack(
+                branched_mpq2 = torch.stack(
                     [
-                        pt.reduce_sum(_br, axis=1, keep_dims=True)
+                        torch.reduce_sum(_br, axis=1, keep_dims=True)
                         for _br in _branched_mpq2
                     ]
                 )
-                _q2_p_mean = pt.reduce_mean(branched_mpq2, axis=0)
+                _q2_p_mean = torch.reduce_mean(branched_mpq2, axis=0)
 
-                self.min_policy_qs[name] = pt.minimum(_q1_p_mean, _q2_p_mean)
+                self.min_policy_qs[name] = torch.minimum(_q1_p_mean, _q2_p_mean)
             else:
-                self.min_policy_qs[name] = pt.minimum(
+                self.min_policy_qs[name] = torch.minimum(
                     self.policy_network.q1_pheads[name],
                     self.policy_network.q2_pheads[name],
                 )
 
-            rewards_holder = pt.placeholder(
-                shape=[None], dtype=pt.float32, name="{}_rewards".format(name)
+            rewards_holder = torch.placeholder(
+                shape=[None], dtype=torch.float32, name="{}_rewards".format(name)
             )
             self.rewards_holders[name] = rewards_holder
 
         q1_losses = []
         q2_losses = []
         # Multiple q losses per stream
-        expanded_dones = pt.expand_dims(self.dones_holder, axis=-1)
+        expanded_dones = torch.expand_dims(self.dones_holder, axis=-1)
         for i, name in enumerate(stream_names):
-            _expanded_rewards = pt.expand_dims(self.rewards_holders[name], axis=-1)
+            _expanded_rewards = torch.expand_dims(self.rewards_holders[name], axis=-1)
 
-            q_backup = pt.stop_gradient(
+            q_backup = torch.stop_gradient(
                 _expanded_rewards
                 + (1.0 - self.use_dones_in_backup[name] * expanded_dones)
                 * self.gammas[i]
@@ -300,74 +300,74 @@ class SACOptimizer(PTOptimizer):
 
                 # Reduce each branch into scalar
                 branched_q1_stream = [
-                    pt.reduce_sum(_branch, axis=1, keep_dims=True)
+                    torch.reduce_sum(_branch, axis=1, keep_dims=True)
                     for _branch in branched_q1_stream
                 ]
                 branched_q2_stream = [
-                    pt.reduce_sum(_branch, axis=1, keep_dims=True)
+                    torch.reduce_sum(_branch, axis=1, keep_dims=True)
                     for _branch in branched_q2_stream
                 ]
 
-                q1_stream = pt.reduce_mean(branched_q1_stream, axis=0)
-                q2_stream = pt.reduce_mean(branched_q2_stream, axis=0)
+                q1_stream = torch.reduce_mean(branched_q1_stream, axis=0)
+                q2_stream = torch.reduce_mean(branched_q2_stream, axis=0)
 
             else:
                 q1_stream = q1_streams[name]
                 q2_stream = q2_streams[name]
 
-            _q1_loss = 0.5 * pt.reduce_mean(
-                pt.to_float(self.policy.mask)
-                * pt.squared_difference(q_backup, q1_stream)
+            _q1_loss = 0.5 * torch.reduce_mean(
+                torch.to_float(self.policy.mask)
+                * torch.squared_difference(q_backup, q1_stream)
             )
 
-            _q2_loss = 0.5 * pt.reduce_mean(
-                pt.to_float(self.policy.mask)
-                * pt.squared_difference(q_backup, q2_stream)
+            _q2_loss = 0.5 * torch.reduce_mean(
+                torch.to_float(self.policy.mask)
+                * torch.squared_difference(q_backup, q2_stream)
             )
 
             q1_losses.append(_q1_loss)
             q2_losses.append(_q2_loss)
 
-        self.q1_loss = pt.reduce_mean(q1_losses)
-        self.q2_loss = pt.reduce_mean(q2_losses)
+        self.q1_loss = torch.reduce_mean(q1_losses)
+        self.q2_loss = torch.reduce_mean(q2_losses)
 
         # Learn entropy coefficient
         if discrete:
             # Create a log_ent_coef for each branch
-            self.log_ent_coef = pt.get_variable(
+            self.log_ent_coef = torch.get_variable(
                 "log_ent_coef",
-                dtype=pt.float32,
+                dtype=torch.float32,
                 initializer=np.log([self.init_entcoef] * len(self.act_size)).astype(
                     np.float32
                 ),
                 trainable=True,
             )
         else:
-            self.log_ent_coef = pt.get_variable(
+            self.log_ent_coef = torch.get_variable(
                 "log_ent_coef",
-                dtype=pt.float32,
+                dtype=torch.float32,
                 initializer=np.log(self.init_entcoef).astype(np.float32),
                 trainable=True,
             )
 
-        self.ent_coef = pt.exp(self.log_ent_coef)
+        self.ent_coef = torch.exp(self.log_ent_coef)
         if discrete:
             # We also have to do a different entropy and target_entropy per branch.
             branched_per_action_ent = ModelUtils.break_into_branches(
                 per_action_entropy, self.act_size
             )
-            branched_ent_sums = pt.stack(
+            branched_ent_sums = torch.stack(
                 [
-                    pt.reduce_sum(_lp, axis=1, keep_dims=True) + _te
+                    torch.reduce_sum(_lp, axis=1, keep_dims=True) + _te
                     for _lp, _te in zip(branched_per_action_ent, self.target_entropy)
                 ],
                 axis=1,
             )
-            self.entropy_loss = -pt.reduce_mean(
-                pt.to_float(self.policy.mask)
-                * pt.reduce_mean(
+            self.entropy_loss = -torch.reduce_mean(
+                torch.to_float(self.policy.mask)
+                * torch.reduce_mean(
                     self.log_ent_coef
-                    * pt.squeeze(pt.stop_gradient(branched_ent_sums), axis=2),
+                    * torch.squeeze(torch.stop_gradient(branched_ent_sums), axis=2),
                     axis=1,
                 )
             )
@@ -379,77 +379,77 @@ class SACOptimizer(PTOptimizer):
                 discrete_action_probs * self.policy_network.q1_p, self.act_size
             )
 
-            branched_policy_loss = pt.stack(
+            branched_policy_loss = torch.stack(
                 [
-                    pt.reduce_sum(self.ent_coef[i] * _lp - _qt, axis=1, keep_dims=True)
+                    torch.reduce_sum(self.ent_coef[i] * _lp - _qt, axis=1, keep_dims=True)
                     for i, (_lp, _qt) in enumerate(
                         zip(branched_per_action_ent, branched_q_term)
                     )
                 ]
             )
-            self.policy_loss = pt.reduce_mean(
-                pt.to_float(self.policy.mask) * pt.squeeze(branched_policy_loss)
+            self.policy_loss = torch.reduce_mean(
+                torch.to_float(self.policy.mask) * torch.squeeze(branched_policy_loss)
             )
 
             # Do vbackup entropy bonus per branch as well.
-            branched_ent_bonus = pt.stack(
+            branched_ent_bonus = torch.stack(
                 [
-                    pt.reduce_sum(self.ent_coef[i] * _lp, axis=1, keep_dims=True)
+                    torch.reduce_sum(self.ent_coef[i] * _lp, axis=1, keep_dims=True)
                     for i, _lp in enumerate(branched_per_action_ent)
                 ]
             )
             value_losses = []
             for name in stream_names:
-                v_backup = pt.stop_gradient(
+                v_backup = torch.stop_gradient(
                     self.min_policy_qs[name]
-                    - pt.reduce_mean(branched_ent_bonus, axis=0)
+                    - torch.reduce_mean(branched_ent_bonus, axis=0)
                 )
                 value_losses.append(
                     0.5
-                    * pt.reduce_mean(
-                        pt.to_float(self.policy.mask)
-                        * pt.squared_difference(
+                    * torch.reduce_mean(
+                        torch.to_float(self.policy.mask)
+                        * torch.squared_difference(
                             self.policy_network.value_heads[name], v_backup
                         )
                     )
                 )
 
         else:
-            self.entropy_loss = -pt.reduce_mean(
+            self.entropy_loss = -torch.reduce_mean(
                 self.log_ent_coef
-                * pt.to_float(self.policy.mask)
-                * pt.stop_gradient(
-                    pt.reduce_sum(
+                * torch.to_float(self.policy.mask)
+                * torch.stop_gradient(
+                    torch.reduce_sum(
                         self.policy.all_log_probs + self.target_entropy,
                         axis=1,
                         keep_dims=True,
                     )
                 )
             )
-            batch_policy_loss = pt.reduce_mean(
+            batch_policy_loss = torch.reduce_mean(
                 self.ent_coef * self.policy.all_log_probs - self.policy_network.q1_p,
                 axis=1,
             )
-            self.policy_loss = pt.reduce_mean(
-                pt.to_float(self.policy.mask) * batch_policy_loss
+            self.policy_loss = torch.reduce_mean(
+                torch.to_float(self.policy.mask) * batch_policy_loss
             )
 
             value_losses = []
             for name in stream_names:
-                v_backup = pt.stop_gradient(
+                v_backup = torch.stop_gradient(
                     self.min_policy_qs[name]
-                    - pt.reduce_sum(self.ent_coef * self.policy.all_log_probs, axis=1)
+                    - torch.reduce_sum(self.ent_coef * self.policy.all_log_probs, axis=1)
                 )
                 value_losses.append(
                     0.5
-                    * pt.reduce_mean(
-                        pt.to_float(self.policy.mask)
-                        * pt.squared_difference(
+                    * torch.reduce_mean(
+                        torch.to_float(self.policy.mask)
+                        * torch.squared_difference(
                             self.policy_network.value_heads[name], v_backup
                         )
                     )
                 )
-        self.value_loss = pt.reduce_mean(value_losses)
+        self.value_loss = torch.reduce_mean(value_losses)
 
         self.total_value_loss = self.q1_loss + self.q2_loss + self.value_loss
 
@@ -471,7 +471,7 @@ class SACOptimizer(PTOptimizer):
         )
 
         self.target_update_op = [
-            pt.assign(target, (1 - self.tau) * target + self.tau * source)
+            torch.assign(target, (1 - self.tau) * target + self.tau * source)
             for target, source in zip(
                 self.target_network.value_vars, self.policy_network.value_vars
             )
@@ -489,7 +489,7 @@ class SACOptimizer(PTOptimizer):
         self.print_all_vars(policy_vars)
 
         self.target_init_op = [
-            pt.assign(target, source)
+            torch.assign(target, source)
             for target, source in zip(
                 self.target_network.value_vars, self.policy_network.value_vars
             )
@@ -500,12 +500,12 @@ class SACOptimizer(PTOptimizer):
         )
 
         # Make sure policy is updated first, then value, then entropy.
-        with pt.control_dependencies([self.update_batch_policy]):
+        with torch.control_dependencies([self.update_batch_policy]):
             self.update_batch_value = value_optimizer.minimize(
                 self.total_value_loss, var_list=self.policy_network.critic_vars
             )
             # Add entropy coefficient optimization operation
-            with pt.control_dependencies([self.update_batch_value]):
+            with torch.control_dependencies([self.update_batch_value]):
                 self.update_batch_entropy = entropy_optimizer.minimize(
                     self.entropy_loss, var_list=self.log_ent_coef
                 )
@@ -544,8 +544,8 @@ class SACOptimizer(PTOptimizer):
             indexed by name. If none, don't update the reward signals.
         """
         # Collect feed dicts for all reward signals.
-        feed_dict: Dict[pt.Tensor, Any] = {}
-        update_dict: Dict[str, pt.Tensor] = {}
+        feed_dict: Dict[torch.Tensor, Any] = {}
+        update_dict: Dict[str, torch.Tensor] = {}
         update_stats: Dict[str, float] = {}
         stats_needed: Dict[str, str] = {}
         if reward_signal_minibatches:
@@ -563,8 +563,8 @@ class SACOptimizer(PTOptimizer):
 
     def add_reward_signal_dicts(
         self,
-        feed_dict: Dict[pt.Tensor, Any],
-        update_dict: Dict[str, pt.Tensor],
+        feed_dict: Dict[torch.Tensor, Any],
+        update_dict: Dict[str, torch.Tensor],
         stats_needed: Dict[str, str],
         reward_signal_minibatches: Mapping[str, AgentBuffer],
         num_sequences: int,
@@ -588,7 +588,7 @@ class SACOptimizer(PTOptimizer):
 
     def _construct_feed_dict(
         self, policy: PTPolicy, batch: AgentBuffer, num_sequences: int
-    ) -> Dict[pt.Tensor, Any]:
+    ) -> Dict[torch.Tensor, Any]:
         """
         Builds the feed dict for updating the SAC model.
         :param model: The model to update. May be different when, e.g. using multi-GPU.

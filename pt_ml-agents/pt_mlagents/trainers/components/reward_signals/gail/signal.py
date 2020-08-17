@@ -1,6 +1,6 @@
 from typing import Any, Dict
 import numpy as np
-from pt_mlagents.pt_utils import pt
+from pt_mlagents.pt_utils import torch
 
 from pt_mlagents.trainers.components.reward_signals import RewardSignal, RewardSignalResult
 from pt_mlagents.trainers.policy.pt_policy import PTPolicy
@@ -33,7 +33,7 @@ class GAILRewardSignal(RewardSignal):
             settings.demo_path, policy.sequence_length, policy.behavior_spec
         )
         self.has_updated = False
-        self.update_dict: Dict[str, pt.Tensor] = {
+        self.update_dict: Dict[str, torch.Tensor] = {
             "gail_loss": self.model.loss,
             "gail_update_batch": self.model.update_batch,
             "gail_policy_estimate": self.model.mean_policy_estimate,
@@ -53,7 +53,7 @@ class GAILRewardSignal(RewardSignal):
         }
 
     def evaluate_batch(self, mini_batch: AgentBuffer) -> RewardSignalResult:
-        feed_dict: Dict[pt.Tensor, Any] = {
+        feed_dict: Dict[torch.Tensor, Any] = {
             self.policy.batch_size_ph: len(mini_batch["actions"]),
             self.policy.sequence_length_ph: self.policy.sequence_length,
         }
@@ -82,7 +82,7 @@ class GAILRewardSignal(RewardSignal):
 
     def prepare_update(
         self, policy: PTPolicy, mini_batch: AgentBuffer, num_sequences: int
-    ) -> Dict[pt.Tensor, Any]:
+    ) -> Dict[torch.Tensor, Any]:
         """
         Prepare inputs for update.
         :param policy: The policy learning from GAIL signal
@@ -95,7 +95,7 @@ class GAILRewardSignal(RewardSignal):
             mini_batch.num_experiences, 1
         )
 
-        feed_dict: Dict[pt.Tensor, Any] = {
+        feed_dict: Dict[torch.Tensor, Any] = {
             self.model.done_expert_holder: mini_batch_demo["done"],
             self.model.done_policy_holder: mini_batch["done"],
         }

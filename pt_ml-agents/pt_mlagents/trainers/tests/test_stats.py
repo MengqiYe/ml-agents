@@ -70,8 +70,8 @@ def test_stat_reporter_property():
     )
 
 
-@mock.patch("pt_mlagents.pt_utils.pt.Summary")
-@mock.patch("pt_mlagents.pt_utils.pt.summary.FileWriter")
+@mock.patch("pt_mlagents.pt_utils.torch.Summary")
+@mock.patch("pt_mlagents.pt_utils.torch.summary.FileWriter")
 def test_tensorboard_writer(mock_filewriter, mock_summary):
     # Test write_stats
     category = "category1"

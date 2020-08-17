@@ -1,6 +1,6 @@
 from typing import Optional, Tuple
 
-from pt_mlagents.pt_utils import pt
+from pt_mlagents.pt_utils import torch
 
 from pt_mlagents.trainers.policy.pt_policy import PTPolicy
 from pt_mlagents.trainers.models import ModelUtils
@@ -40,8 +40,8 @@ class GAILModel(object):
         self.use_vail = use_vail
         self.use_actions = use_actions  # True # Not using actions
 
-        self.noise: Optional[pt.Tensor] = None
-        self.z: Optional[pt.Tensor] = None
+        self.noise: Optional[torch.Tensor] = None
+        self.z: Optional[torch.Tensor] = None
 
         self.make_inputs()
         self.create_network()
@@ -54,35 +54,35 @@ class GAILModel(object):
         Creates the beta parameter and its updater for GAIL
         """
 
-        new_beta = pt.maximum(
+        new_beta = torch.maximum(
             self.beta + self.alpha * (self.kl_loss - self.mutual_information), EPSILON
         )
-        with pt.control_dependencies([self.update_batch]):
-            self.update_beta = pt.assign(self.beta, new_beta)
+        with torch.control_dependencies([self.update_batch]):
+            self.update_beta = torch.assign(self.beta, new_beta)
 
     def make_inputs(self) -> None:
         """
         Creates the input layers for the discriminator
         """
-        self.done_expert_holder = pt.placeholder(shape=[None], dtype=pt.float32)
-        self.done_policy_holder = pt.placeholder(shape=[None], dtype=pt.float32)
-        self.done_expert = pt.expand_dims(self.done_expert_holder, -1)
-        self.done_policy = pt.expand_dims(self.done_policy_holder, -1)
+        self.done_expert_holder = torch.placeholder(shape=[None], dtype=torch.float32)
+        self.done_policy_holder = torch.placeholder(shape=[None], dtype=torch.float32)
+        self.done_expert = torch.expand_dims(self.done_expert_holder, -1)
+        self.done_policy = torch.expand_dims(self.done_policy_holder, -1)
 
         if self.policy.behavior_spec.is_action_continuous():
             action_length = self.policy.act_size[0]
-            self.action_in_expert = pt.placeholder(
-                shape=[None, action_length], dtype=pt.float32
+            self.action_in_expert = torch.placeholder(
+                shape=[None, action_length], dtype=torch.float32
             )
-            self.expert_action = pt.identity(self.action_in_expert)
+            self.expert_action = torch.identity(self.action_in_expert)
         else:
             action_length = len(self.policy.act_size)
-            self.action_in_expert = pt.placeholder(
-                shape=[None, action_length], dtype=pt.int32
+            self.action_in_expert = torch.placeholder(
+                shape=[None, action_length], dtype=torch.int32
             )
-            self.expert_action = pt.concat(
+            self.expert_action = torch.concat(
                 [
-                    pt.one_hot(self.action_in_expert[:, i], act_size)
+                    torch.one_hot(self.action_in_expert[:, i], act_size)
                     for i, act_size in enumerate(self.policy.act_size)
                 ],
                 axis=1,
@@ -138,17 +138,17 @@ class GAILModel(object):
                 )
                 visual_policy_encoders.append(encoded_policy_visual)
                 visual_expert_encoders.append(encoded_expert_visual)
-            hidden_policy_visual = pt.concat(visual_policy_encoders, axis=1)
-            hidden_expert_visual = pt.concat(visual_expert_encoders, axis=1)
+            hidden_policy_visual = torch.concat(visual_policy_encoders, axis=1)
+            hidden_expert_visual = torch.concat(visual_expert_encoders, axis=1)
             encoded_policy_list.append(hidden_policy_visual)
             encoded_expert_list.append(hidden_expert_visual)
 
-        self.encoded_expert = pt.concat(encoded_expert_list, axis=1)
-        self.encoded_policy = pt.concat(encoded_policy_list, axis=1)
+        self.encoded_expert = torch.concat(encoded_expert_list, axis=1)
+        self.encoded_policy = torch.concat(encoded_policy_list, axis=1)
 
     def create_encoder(
-        self, state_in: pt.Tensor, action_in: pt.Tensor, done_in: pt.Tensor, reuse: bool
-    ) -> Tuple[pt.Tensor, pt.Tensor, pt.Tensor]:
+        self, state_in: torch.Tensor, action_in: torch.Tensor, done_in: torch.Tensor, reuse: bool
+    ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         """
         Creates the encoder for the discriminator
         :param state_in: The encoded observation input
@@ -156,13 +156,13 @@ class GAILModel(object):
         :param done_in: The done flags input
         :param reuse: If true, the weights will be shared with the previous encoder created
         """
-        with pt.variable_scope("GAIL_model"):
+        with torch.variable_scope("GAIL_model"):
             if self.use_actions:
-                concat_input = pt.concat([state_in, action_in, done_in], axis=1)
+                concat_input = torch.concat([state_in, action_in, done_in], axis=1)
             else:
                 concat_input = state_in
 
-            hidden_1 = pt.layers.dense(
+            hidden_1 = torch.layers.dense(
                 concat_input,
                 self.h_size,
                 activation=ModelUtils.swish,
@@ -170,7 +170,7 @@ class GAILModel(object):
                 reuse=reuse,
             )
 
-            hidden_2 = pt.layers.dense(
+            hidden_2 = torch.layers.dense(
                 hidden_1,
                 self.h_size,
                 activation=ModelUtils.swish,
@@ -181,7 +181,7 @@ class GAILModel(object):
             z_mean = None
             if self.use_vail:
                 # Latent representation
-                z_mean = pt.layers.dense(
+                z_mean = torch.layers.dense(
                     hidden_2,
                     self.z_size,
                     reuse=reuse,
@@ -189,7 +189,7 @@ class GAILModel(object):
                     kernel_initializer=ModelUtils.scaled_init(0.01),
                 )
 
-                self.noise = pt.random_normal(pt.shape(z_mean), dtype=pt.float32)
+                self.noise = torch.random_normal(torch.shape(z_mean), dtype=torch.float32)
 
                 # Sampled latent code
                 self.z = z_mean + self.z_sigma * self.noise * self.use_noise
@@ -197,10 +197,10 @@ class GAILModel(object):
             else:
                 estimate_input = hidden_2
 
-            estimate = pt.layers.dense(
+            estimate = torch.layers.dense(
                 estimate_input,
                 1,
-                activation=pt.nn.sigmoid,
+                activation=torch.nn.sigmoid,
                 name="gail_d_estimate",
                 reuse=reuse,
             )
@@ -211,16 +211,16 @@ class GAILModel(object):
         Helper for creating the intrinsic reward nodes
         """
         if self.use_vail:
-            self.z_sigma = pt.get_variable(
+            self.z_sigma = torch.get_variable(
                 "gail_sigma_vail",
                 self.z_size,
-                dtype=pt.float32,
-                initializer=pt.ones_initializer(),
+                dtype=torch.float32,
+                initializer=torch.ones_initializer(),
             )
             self.z_sigma_sq = self.z_sigma * self.z_sigma
-            self.z_log_sigma_sq = pt.log(self.z_sigma_sq + EPSILON)
-            self.use_noise = pt.placeholder(
-                shape=[1], dtype=pt.float32, name="gail_NoiseLevel"
+            self.z_log_sigma_sq = torch.log(self.z_sigma_sq + EPSILON)
+            self.use_noise = torch.placeholder(
+                shape=[1], dtype=torch.float32, name="gail_NoiseLevel"
             )
         self.expert_estimate, self.z_mean_expert, _ = self.create_encoder(
             self.encoded_expert, self.expert_action, self.done_expert, reuse=False
@@ -231,14 +231,14 @@ class GAILModel(object):
             self.done_policy,
             reuse=True,
         )
-        self.mean_policy_estimate = pt.reduce_mean(self.policy_estimate)
-        self.mean_expert_estimate = pt.reduce_mean(self.expert_estimate)
-        self.discriminator_score = pt.reshape(
+        self.mean_policy_estimate = torch.reduce_mean(self.policy_estimate)
+        self.mean_expert_estimate = torch.reduce_mean(self.expert_estimate)
+        self.discriminator_score = torch.reshape(
             self.policy_estimate, [-1], name="gail_reward"
         )
-        self.intrinsic_reward = -pt.log(1.0 - self.discriminator_score + EPSILON)
+        self.intrinsic_reward = -torch.log(1.0 - self.discriminator_score + EPSILON)
 
-    def create_gradient_magnitude(self) -> pt.Tensor:
+    def create_gradient_magnitude(self) -> torch.Tensor:
         """
         Gradient penalty from https://arxiv.org/pdf/1704.00028. Adds stability esp.
         for off-policy. Compute gradients w.r.t randomly interpolated input.
@@ -247,18 +247,18 @@ class GAILModel(object):
         policy = [self.encoded_policy, self.policy.selected_actions, self.done_policy]
         interp = []
         for _expert_in, _policy_in in zip(expert, policy):
-            alpha = pt.random_uniform(pt.shape(_expert_in))
+            alpha = torch.random_uniform(torch.shape(_expert_in))
             interp.append(alpha * _expert_in + (1 - alpha) * _policy_in)
 
         grad_estimate, _, grad_input = self.create_encoder(
             interp[0], interp[1], interp[2], reuse=True
         )
 
-        grad = pt.gradients(grad_estimate, [grad_input])[0]
+        grad = torch.gradients(grad_estimate, [grad_input])[0]
 
         # Norm's gradient could be NaN at 0. Use our own safe_norm
-        safe_norm = pt.sqrt(pt.reduce_sum(grad ** 2, axis=-1) + EPSILON)
-        gradient_mag = pt.reduce_mean(pt.pow(safe_norm - 1, 2))
+        safe_norm = torch.sqrt(torch.reduce_sum(grad ** 2, axis=-1) + EPSILON)
+        gradient_mag = torch.reduce_mean(torch.pow(safe_norm - 1, 2))
 
         return gradient_mag
 
@@ -267,32 +267,32 @@ class GAILModel(object):
         Creates the loss and update nodes for the GAIL reward generator
         :param learning_rate: The learning rate for the optimizer
         """
-        self.mean_expert_estimate = pt.reduce_mean(self.expert_estimate)
-        self.mean_policy_estimate = pt.reduce_mean(self.policy_estimate)
+        self.mean_expert_estimate = torch.reduce_mean(self.expert_estimate)
+        self.mean_policy_estimate = torch.reduce_mean(self.policy_estimate)
 
         if self.use_vail:
-            self.beta = pt.get_variable(
+            self.beta = torch.get_variable(
                 "gail_beta",
                 [],
                 trainable=False,
-                dtype=pt.float32,
-                initializer=pt.ones_initializer(),
+                dtype=torch.float32,
+                initializer=torch.ones_initializer(),
             )
 
-        self.discriminator_loss = -pt.reduce_mean(
-            pt.log(self.expert_estimate + EPSILON)
-            + pt.log(1.0 - self.policy_estimate + EPSILON)
+        self.discriminator_loss = -torch.reduce_mean(
+            torch.log(self.expert_estimate + EPSILON)
+            + torch.log(1.0 - self.policy_estimate + EPSILON)
         )
 
         if self.use_vail:
             # KL divergence loss (encourage latent representation to be normal)
-            self.kl_loss = pt.reduce_mean(
-                -pt.reduce_sum(
+            self.kl_loss = torch.reduce_mean(
+                -torch.reduce_sum(
                     1
                     + self.z_log_sigma_sq
-                    - 0.5 * pt.square(self.z_mean_expert)
-                    - 0.5 * pt.square(self.z_mean_policy)
-                    - pt.exp(self.z_log_sigma_sq),
+                    - 0.5 * torch.square(self.z_mean_expert)
+                    - 0.5 * torch.square(self.z_mean_policy)
+                    - torch.exp(self.z_log_sigma_sq),
                     1,
                 )
             )
@@ -306,5 +306,5 @@ class GAILModel(object):
         if self.gradient_penalty_weight > 0.0:
             self.loss += self.gradient_penalty_weight * self.create_gradient_magnitude()
 
-        optimizer = pt.train.AdamOptimizer(learning_rate=learning_rate)
+        optimizer = torch.train.AdamOptimizer(learning_rate=learning_rate)
         self.update_batch = optimizer.minimize(self.loss)

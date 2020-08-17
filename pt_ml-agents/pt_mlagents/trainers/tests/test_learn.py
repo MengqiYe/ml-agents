@@ -109,18 +109,18 @@ def test_commandline_args(mock_file):
     #     parse_command_line([])
     # Test with defaults
     opt = parse_command_line(["mytrainerpath"])
-    assert opt.behaviors == {}
-    assert opt.env_settings.env_path is None
-    assert opt.checkpoint_settings.resume is False
-    assert opt.checkpoint_settings.inference is False
-    assert opt.checkpoint_settings.run_id == "ppo"
-    assert opt.checkpoint_settings.initialize_from is None
-    assert opt.env_settings.seed == -1
-    assert opt.env_settings.base_port == 5005
-    assert opt.env_settings.num_envs == 1
-    assert opt.engine_settings.no_graphics is False
-    assert opt.debug is False
-    assert opt.env_settings.env_args is None
+    assert otorch.behaviors == {}
+    assert otorch.env_settings.env_path is None
+    assert otorch.checkpoint_settings.resume is False
+    assert otorch.checkpoint_settings.inference is False
+    assert otorch.checkpoint_settings.run_id == "ppo"
+    assert otorch.checkpoint_settings.initialize_from is None
+    assert otorch.env_settings.seed == -1
+    assert otorch.env_settings.base_port == 5005
+    assert otorch.env_settings.num_envs == 1
+    assert otorch.engine_settings.no_graphics is False
+    assert otorch.debug is False
+    assert otorch.env_settings.env_args is None
 
     full_args = [
         "mytrainerpath",
@@ -138,17 +138,17 @@ def test_commandline_args(mock_file):
     ]
 
     opt = parse_command_line(full_args)
-    assert opt.behaviors == {}
-    assert opt.env_settings.env_path == "./myenvfile"
-    assert opt.checkpoint_settings.run_id == "myawesomerun"
-    assert opt.checkpoint_settings.initialize_from == "testdir"
-    assert opt.env_settings.seed == 7890
-    assert opt.env_settings.base_port == 4004
-    assert opt.env_settings.num_envs == 2
-    assert opt.engine_settings.no_graphics is True
-    assert opt.debug is True
-    assert opt.checkpoint_settings.inference is True
-    assert opt.checkpoint_settings.resume is True
+    assert otorch.behaviors == {}
+    assert otorch.env_settings.env_path == "./myenvfile"
+    assert otorch.checkpoint_settings.run_id == "myawesomerun"
+    assert otorch.checkpoint_settings.initialize_from == "testdir"
+    assert otorch.env_settings.seed == 7890
+    assert otorch.env_settings.base_port == 4004
+    assert otorch.env_settings.num_envs == 2
+    assert otorch.engine_settings.no_graphics is True
+    assert otorch.debug is True
+    assert otorch.checkpoint_settings.inference is True
+    assert otorch.checkpoint_settings.resume is True
 
 
 @patch("builtins.open", new_callable=mock_open, read_data=MOCK_PARAMETER_YAML)
@@ -156,16 +156,16 @@ def test_yaml_args(mock_file):
     # Test with opts loaded from YAML
     DetectDefault.non_default_args.clear()
     opt = parse_command_line(["mytrainerpath"])
-    assert opt.behaviors == {}
-    assert opt.env_settings.env_path == "./oldenvfile"
-    assert opt.checkpoint_settings.run_id == "uselessrun"
-    assert opt.checkpoint_settings.initialize_from == "notuselessrun"
-    assert opt.env_settings.seed == 9870
-    assert opt.env_settings.base_port == 4001
-    assert opt.env_settings.num_envs == 4
-    assert opt.engine_settings.no_graphics is False
-    assert opt.debug is False
-    assert opt.env_settings.env_args is None
+    assert otorch.behaviors == {}
+    assert otorch.env_settings.env_path == "./oldenvfile"
+    assert otorch.checkpoint_settings.run_id == "uselessrun"
+    assert otorch.checkpoint_settings.initialize_from == "notuselessrun"
+    assert otorch.env_settings.seed == 9870
+    assert otorch.env_settings.base_port == 4001
+    assert otorch.env_settings.num_envs == 4
+    assert otorch.engine_settings.no_graphics is False
+    assert otorch.debug is False
+    assert otorch.env_settings.env_args is None
     # Test that CLI overrides YAML
     full_args = [
         "mytrainerpath",
@@ -182,16 +182,16 @@ def test_yaml_args(mock_file):
     ]
 
     opt = parse_command_line(full_args)
-    assert opt.behaviors == {}
-    assert opt.env_settings.env_path == "./myenvfile"
-    assert opt.checkpoint_settings.run_id == "myawesomerun"
-    assert opt.env_settings.seed == 7890
-    assert opt.env_settings.base_port == 4004
-    assert opt.env_settings.num_envs == 2
-    assert opt.engine_settings.no_graphics is True
-    assert opt.debug is True
-    assert opt.checkpoint_settings.inference is True
-    assert opt.checkpoint_settings.resume is True
+    assert otorch.behaviors == {}
+    assert otorch.env_settings.env_path == "./myenvfile"
+    assert otorch.checkpoint_settings.run_id == "myawesomerun"
+    assert otorch.env_settings.seed == 7890
+    assert otorch.env_settings.base_port == 4004
+    assert otorch.env_settings.num_envs == 2
+    assert otorch.engine_settings.no_graphics is True
+    assert otorch.debug is True
+    assert otorch.checkpoint_settings.inference is True
+    assert otorch.checkpoint_settings.resume is True
 
 
 @patch("builtins.open", new_callable=mock_open, read_data=MOCK_YAML)
@@ -207,4 +207,4 @@ def test_env_args(mock_file):
     ]
 
     opt = parse_command_line(full_args)
-    assert opt.env_settings.env_args == ["--foo=bar", "--blah", "baz", "100"]
+    assert otorch.env_settings.env_args == ["--foo=bar", "--blah", "baz", "100"]

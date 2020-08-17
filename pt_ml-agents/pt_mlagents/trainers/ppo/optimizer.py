@@ -1,6 +1,6 @@
 from typing import Optional, Any, Dict, cast
 import numpy as np
-from pt_mlagents.pt_utils import pt
+from pt_mlagents.pt_utils import torch
 from pt_mlagents_envs.timers import timed
 from pt_mlagents.trainers.models import ModelUtils, EncoderType
 from pt_mlagents.trainers.policy.pt_policy import PTPolicy
@@ -21,7 +21,7 @@ class PPOOptimizer(PTOptimizer):
         policy.create_pt_graph()
 
         with policy.graph.as_default():
-            with pt.variable_scope("optimizer/"):
+            with torch.variable_scope("optimizer/"):
                 super().__init__(policy, trainer_params)
                 hyperparameters: PPOSettings = cast(
                     PPOSettings, trainer_params.hyperparameters
@@ -40,9 +40,9 @@ class PPOOptimizer(PTOptimizer):
 
                 self.stream_names = list(self.reward_signals.keys())
 
-                self.pt_optimizer: Optional[pt.train.AdamOptimizer] = None
+                self.pt_optimizer: Optional[torch.train.AdamOptimizer] = None
                 self.grads = None
-                self.update_batch: Optional[pt.Operation] = None
+                self.update_batch: Optional[torch.Operation] = None
 
                 self.stats_name_to_update_name = {
                     "Losses/Value Loss": "value_loss",
@@ -53,9 +53,9 @@ class PPOOptimizer(PTOptimizer):
                 }
                 if self.policy.use_recurrent:
                     self.m_size = self.policy.m_size
-                    self.memory_in = pt.placeholder(
+                    self.memory_in = torch.placeholder(
                         shape=[None, self.m_size],
-                        dtype=pt.float32,
+                        dtype=torch.float32,
                         name="recurrent_value_in",
                     )
 
@@ -130,14 +130,14 @@ class PPOOptimizer(PTOptimizer):
         self.value_heads, self.value = ModelUtils.create_value_heads(
             self.stream_names, hidden_value
         )
-        self.all_old_log_probs = pt.placeholder(
+        self.all_old_log_probs = torch.placeholder(
             shape=[None, sum(self.policy.act_size)],
-            dtype=pt.float32,
+            dtype=torch.float32,
             name="old_probabilities",
         )
 
-        self.old_log_probs = pt.reduce_sum(
-            (pt.identity(self.all_old_log_probs)), axis=1, keepdims=True
+        self.old_log_probs = torch.reduce_sum(
+            (torch.identity(self.all_old_log_probs)), axis=1, keepdims=True
         )
 
     def _create_dc_critic(
@@ -173,9 +173,9 @@ class PPOOptimizer(PTOptimizer):
             self.stream_names, hidden_value
         )
 
-        self.all_old_log_probs = pt.placeholder(
+        self.all_old_log_probs = torch.placeholder(
             shape=[None, sum(self.policy.act_size)],
-            dtype=pt.float32,
+            dtype=torch.float32,
             name="old_probabilities",
         )
 
@@ -190,11 +190,11 @@ class PPOOptimizer(PTOptimizer):
 
         action_idx = [0] + list(np.cumsum(self.policy.act_size))
 
-        self.old_log_probs = pt.reduce_sum(
+        self.old_log_probs = torch.reduce_sum(
             (
-                pt.stack(
+                torch.stack(
                     [
-                        -pt.nn.softmax_cross_entropy_with_logits_v2(
+                        -torch.nn.softmax_cross_entropy_with_logits_v2(
                             labels=self.policy.selected_actions[
                                 :, action_idx[i] : action_idx[i + 1]
                             ],
@@ -228,18 +228,18 @@ class PPOOptimizer(PTOptimizer):
         self.returns_holders = {}
         self.old_values = {}
         for name in value_heads.keys():
-            returns_holder = pt.placeholder(
-                shape=[None], dtype=pt.float32, name="{}_returns".format(name)
+            returns_holder = torch.placeholder(
+                shape=[None], dtype=torch.float32, name="{}_returns".format(name)
             )
-            old_value = pt.placeholder(
-                shape=[None], dtype=pt.float32, name="{}_value_estimate".format(name)
+            old_value = torch.placeholder(
+                shape=[None], dtype=torch.float32, name="{}_value_estimate".format(name)
             )
             self.returns_holders[name] = returns_holder
             self.old_values[name] = old_value
-        self.advantage = pt.placeholder(
-            shape=[None], dtype=pt.float32, name="advantages"
+        self.advantage = torch.placeholder(
+            shape=[None], dtype=torch.float32, name="advantages"
         )
-        advantage = pt.expand_dims(self.advantage, -1)
+        advantage = torch.expand_dims(self.advantage, -1)
 
         self.decay_epsilon = ModelUtils.create_schedule(
             self._schedule, epsilon, self.policy.global_step, max_step, min_value=0.1
@@ -250,44 +250,44 @@ class PPOOptimizer(PTOptimizer):
 
         value_losses = []
         for name, head in value_heads.items():
-            clipped_value_estimate = self.old_values[name] + pt.clip_by_value(
-                pt.reduce_sum(head, axis=1) - self.old_values[name],
+            clipped_value_estimate = self.old_values[name] + torch.clip_by_value(
+                torch.reduce_sum(head, axis=1) - self.old_values[name],
                 -self.decay_epsilon,
                 self.decay_epsilon,
             )
-            v_opt_a = pt.squared_difference(
-                self.returns_holders[name], pt.reduce_sum(head, axis=1)
+            v_opt_a = torch.squared_difference(
+                self.returns_holders[name], torch.reduce_sum(head, axis=1)
             )
-            v_opt_b = pt.squared_difference(
+            v_opt_b = torch.squared_difference(
                 self.returns_holders[name], clipped_value_estimate
             )
-            value_loss = pt.reduce_mean(
-                pt.dynamic_partition(pt.maximum(v_opt_a, v_opt_b), self.policy.mask, 2)[
+            value_loss = torch.reduce_mean(
+                torch.dynamic_partition(torch.maximum(v_opt_a, v_opt_b), self.policy.mask, 2)[
                     1
                 ]
             )
             value_losses.append(value_loss)
-        self.value_loss = pt.reduce_mean(value_losses)
+        self.value_loss = torch.reduce_mean(value_losses)
 
-        r_theta = pt.exp(probs - old_probs)
+        r_theta = torch.exp(probs - old_probs)
         p_opt_a = r_theta * advantage
         p_opt_b = (
-            pt.clip_by_value(
+            torch.clip_by_value(
                 r_theta, 1.0 - self.decay_epsilon, 1.0 + self.decay_epsilon
             )
             * advantage
         )
-        self.policy_loss = -pt.reduce_mean(
-            pt.dynamic_partition(pt.minimum(p_opt_a, p_opt_b), self.policy.mask, 2)[1]
+        self.policy_loss = -torch.reduce_mean(
+            torch.dynamic_partition(torch.minimum(p_opt_a, p_opt_b), self.policy.mask, 2)[1]
         )
         # For cleaner stats reporting
-        self.abs_policy_loss = pt.abs(self.policy_loss)
+        self.abs_policy_loss = torch.abs(self.policy_loss)
 
         self.loss = (
             self.policy_loss
             + 0.5 * self.value_loss
             - self.decay_beta
-            * pt.reduce_mean(pt.dynamic_partition(entropy, self.policy.mask, 2)[1])
+            * torch.reduce_mean(torch.dynamic_partition(entropy, self.policy.mask, 2)[1])
         )
 
     def _create_ppo_optimizer_ops(self):
@@ -320,7 +320,7 @@ class PPOOptimizer(PTOptimizer):
 
     def _construct_feed_dict(
         self, mini_batch: AgentBuffer, num_sequences: int
-    ) -> Dict[pt.Tensor, Any]:
+    ) -> Dict[torch.Tensor, Any]:
         # Do an optional burn-in for memories
         num_burn_in = int(self.burn_in_ratio * self.policy.sequence_length)
         burn_in_mask = np.ones((self.policy.sequence_length), dtype=np.float32)

@@ -1,5 +1,5 @@
 from typing import List, Tuple
-from pt_mlagents.pt_utils import pt
+from pt_mlagents.pt_utils import torch
 
 from pt_mlagents.trainers.models import ModelUtils
 from pt_mlagents.trainers.policy.pt_policy import PTPolicy
@@ -17,13 +17,13 @@ class CuriosityModel(object):
         """
         self.encoding_size = encoding_size
         self.policy = policy
-        self.next_visual_in: List[pt.Tensor] = []
+        self.next_visual_in: List[torch.Tensor] = []
         encoded_state, encoded_next_state = self.create_curiosity_encoders()
         self.create_inverse_model(encoded_state, encoded_next_state)
         self.create_forward_model(encoded_state, encoded_next_state)
         self.create_loss(learning_rate)
 
-    def create_curiosity_encoders(self) -> Tuple[pt.Tensor, pt.Tensor]:
+    def create_curiosity_encoders(self) -> Tuple[torch.Tensor, torch.Tensor]:
         """
         Creates state encoders for current and future observations.
         Used for implementation of ﻿Curiosity-driven Exploration by Self-supervised Prediction
@@ -66,8 +66,8 @@ class CuriosityModel(object):
                 visual_encoders.append(encoded_visual)
                 next_visual_encoders.append(encoded_next_visual)
 
-            hidden_visual = pt.concat(visual_encoders, axis=1)
-            hidden_next_visual = pt.concat(next_visual_encoders, axis=1)
+            hidden_visual = torch.concat(visual_encoders, axis=1)
+            hidden_next_visual = torch.concat(next_visual_encoders, axis=1)
             encoded_state_list.append(hidden_visual)
             encoded_next_state_list.append(hidden_next_visual)
 
@@ -90,12 +90,12 @@ class CuriosityModel(object):
             )
             encoded_state_list.append(encoded_vector_obs)
             encoded_next_state_list.append(encoded_next_vector_obs)
-        encoded_state = pt.concat(encoded_state_list, axis=1)
-        encoded_next_state = pt.concat(encoded_next_state_list, axis=1)
+        encoded_state = torch.concat(encoded_state_list, axis=1)
+        encoded_next_state = torch.concat(encoded_next_state_list, axis=1)
         return encoded_state, encoded_next_state
 
     def create_inverse_model(
-        self, encoded_state: pt.Tensor, encoded_next_state: pt.Tensor
+        self, encoded_state: torch.Tensor, encoded_next_state: torch.Tensor
     ) -> None:
         """
         Creates inverse model TensorFlow ops for Curiosity module.
@@ -103,37 +103,37 @@ class CuriosityModel(object):
         :param encoded_state: Tensor corresponding to encoded current state.
         :param encoded_next_state: Tensor corresponding to encoded next state.
         """
-        combined_input = pt.concat([encoded_state, encoded_next_state], axis=1)
-        hidden = pt.layers.dense(combined_input, 256, activation=ModelUtils.swish)
+        combined_input = torch.concat([encoded_state, encoded_next_state], axis=1)
+        hidden = torch.layers.dense(combined_input, 256, activation=ModelUtils.swish)
         if self.policy.behavior_spec.is_action_continuous():
-            pred_action = pt.layers.dense(
+            pred_action = torch.layers.dense(
                 hidden, self.policy.act_size[0], activation=None
             )
-            squared_difference = pt.reduce_sum(
-                pt.squared_difference(pred_action, self.policy.selected_actions), axis=1
+            squared_difference = torch.reduce_sum(
+                torch.squared_difference(pred_action, self.policy.selected_actions), axis=1
             )
-            self.inverse_loss = pt.reduce_mean(
-                pt.dynamic_partition(squared_difference, self.policy.mask, 2)[1]
+            self.inverse_loss = torch.reduce_mean(
+                torch.dynamic_partition(squared_difference, self.policy.mask, 2)[1]
             )
         else:
-            pred_action = pt.concat(
+            pred_action = torch.concat(
                 [
-                    pt.layers.dense(
-                        hidden, self.policy.act_size[i], activation=pt.nn.softmax
+                    torch.layers.dense(
+                        hidden, self.policy.act_size[i], activation=torch.nn.softmax
                     )
                     for i in range(len(self.policy.act_size))
                 ],
                 axis=1,
             )
-            cross_entropy = pt.reduce_sum(
-                -pt.log(pred_action + 1e-10) * self.policy.selected_actions, axis=1
+            cross_entropy = torch.reduce_sum(
+                -torch.log(pred_action + 1e-10) * self.policy.selected_actions, axis=1
             )
-            self.inverse_loss = pt.reduce_mean(
-                pt.dynamic_partition(cross_entropy, self.policy.mask, 2)[1]
+            self.inverse_loss = torch.reduce_mean(
+                torch.dynamic_partition(cross_entropy, self.policy.mask, 2)[1]
             )
 
     def create_forward_model(
-        self, encoded_state: pt.Tensor, encoded_next_state: pt.Tensor
+        self, encoded_state: torch.Tensor, encoded_next_state: torch.Tensor
     ) -> None:
         """
         Creates forward model TensorFlow ops for Curiosity module.
@@ -141,22 +141,22 @@ class CuriosityModel(object):
         :param encoded_state: Tensor corresponding to encoded current state.
         :param encoded_next_state: Tensor corresponding to encoded next state.
         """
-        combined_input = pt.concat(
+        combined_input = torch.concat(
             [encoded_state, self.policy.selected_actions], axis=1
         )
-        hidden = pt.layers.dense(combined_input, 256, activation=ModelUtils.swish)
-        pred_next_state = pt.layers.dense(
+        hidden = torch.layers.dense(combined_input, 256, activation=ModelUtils.swish)
+        pred_next_state = torch.layers.dense(
             hidden,
             self.encoding_size
             * (self.policy.vis_obs_size + int(self.policy.vec_obs_size > 0)),
             activation=None,
         )
-        squared_difference = 0.5 * pt.reduce_sum(
-            pt.squared_difference(pred_next_state, encoded_next_state), axis=1
+        squared_difference = 0.5 * torch.reduce_sum(
+            torch.squared_difference(pred_next_state, encoded_next_state), axis=1
         )
         self.intrinsic_reward = squared_difference
-        self.forward_loss = pt.reduce_mean(
-            pt.dynamic_partition(squared_difference, self.policy.mask, 2)[1]
+        self.forward_loss = torch.reduce_mean(
+            torch.dynamic_partition(squared_difference, self.policy.mask, 2)[1]
         )
 
     def create_loss(self, learning_rate: float) -> None:
@@ -165,5 +165,5 @@ class CuriosityModel(object):
         :param learning_rate: The learning rate for the optimizer.
         """
         self.loss = 10 * (0.2 * self.forward_loss + 0.8 * self.inverse_loss)
-        optimizer = pt.train.AdamOptimizer(learning_rate=learning_rate)
+        optimizer = torch.train.AdamOptimizer(learning_rate=learning_rate)
         self.update_batch = optimizer.minimize(self.loss)

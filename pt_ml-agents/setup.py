@@ -76,7 +76,7 @@ setup(
     entry_points={
         "console_scripts": [
             "pt_mlagents-learn=pt_mlagents.trainers.learn:main",
-            "mlagents-run-experiment=mlagents.trainers.run_experiment:main",
+            "mlagents-run-experiment=pt_mlagents.trainers.run_experiment:main",
         ]
     },
     cmdclass={"verify": VerifyVersionCommand},

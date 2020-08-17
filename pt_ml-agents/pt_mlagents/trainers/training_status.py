@@ -5,7 +5,7 @@ import json
 import attr
 import cattr
 
-from pt_mlagents.pt_utils import pt
+from pt_mlagents.pt_utils import torch
 from pt_mlagents_envs.logging_util import get_logger
 from pt_mlagents.trainers import __version__
 from pt_mlagents.trainers.exception import TrainerError
@@ -24,7 +24,7 @@ class StatusType(Enum):
 class StatusMetaData:
     stats_format_version: str = STATUS_FORMAT_VERSION
     pt_mlagents_version: str = __version__
-    tensorflow_version: str = pt.__version__
+    tensorflow_version: str = torch.__version__
 
     def to_dict(self) -> Dict[str, str]:
         return cattr.unstructure(self)
