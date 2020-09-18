@@ -1,9 +1,9 @@
 from sys import platform
 from typing import Optional, Any, List
-from mlagents_envs.environment import UnityEnvironment
-from mlagents_envs.base_env import BaseEnv
-from mlagents_envs.registry.binary_utils import get_local_binary_path
-from mlagents_envs.registry.base_registry_entry import BaseRegistryEntry
+from pt_mlagents_envs.environment import UnityEnvironment
+from pt_mlagents_envs.base_env import BaseEnv
+from pt_mlagents_envs.registry.binary_utils import get_local_binary_path
+from pt_mlagents_envs.registry.base_registry_entry import BaseRegistryEntry
 
 
 class RemoteRegistryEntry(BaseRegistryEntry):

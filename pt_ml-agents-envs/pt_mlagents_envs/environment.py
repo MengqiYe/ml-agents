@@ -6,14 +6,14 @@ import os
 import subprocess
 from typing import Dict, List, Optional, Tuple, Mapping as MappingType
 
-import mlagents_envs
+import pt_mlagents_envs
 
-from mlagents_envs.logging_util import get_logger
-from mlagents_envs.side_channel.side_channel import SideChannel
-from mlagents_envs.side_channel.side_channel_manager import SideChannelManager
-from mlagents_envs import env_utils
+from pt_mlagents_envs.logging_util import get_logger
+from pt_mlagents_envs.side_channel.side_channel import SideChannel
+from pt_mlagents_envs.side_channel.side_channel_manager import SideChannelManager
+from pt_mlagents_envs import env_utils
 
-from mlagents_envs.base_env import (
+from pt_mlagents_envs.base_env import (
     BaseEnv,
     DecisionSteps,
     TerminalSteps,
@@ -22,27 +22,27 @@ from mlagents_envs.base_env import (
     AgentId,
     BehaviorMapping,
 )
-from mlagents_envs.timers import timed, hierarchical_timer
-from mlagents_envs.exception import (
+from pt_mlagents_envs.timers import timed, hierarchical_timer
+from pt_mlagents_envs.exception import (
     UnityEnvironmentException,
     UnityActionException,
     UnityTimeOutException,
     UnityCommunicatorStoppedException,
 )
 
-from mlagents_envs.communicator_objects.command_pb2 import STEP, RESET
-from mlagents_envs.rpc_utils import behavior_spec_from_proto, steps_from_proto
+from pt_mlagents_envs.communicator_objects.command_pb2 import STEP, RESET
+from pt_mlagents_envs.rpc_utils import behavior_spec_from_proto, steps_from_proto
 
-from mlagents_envs.communicator_objects.unity_rl_input_pb2 import UnityRLInputProto
-from mlagents_envs.communicator_objects.unity_rl_output_pb2 import UnityRLOutputProto
-from mlagents_envs.communicator_objects.agent_action_pb2 import AgentActionProto
-from mlagents_envs.communicator_objects.unity_output_pb2 import UnityOutputProto
-from mlagents_envs.communicator_objects.capabilities_pb2 import UnityRLCapabilitiesProto
-from mlagents_envs.communicator_objects.unity_rl_initialization_input_pb2 import (
+from pt_mlagents_envs.communicator_objects.unity_rl_input_pb2 import UnityRLInputProto
+from pt_mlagents_envs.communicator_objects.unity_rl_output_pb2 import UnityRLOutputProto
+from pt_mlagents_envs.communicator_objects.agent_action_pb2 import AgentActionProto
+from pt_mlagents_envs.communicator_objects.unity_output_pb2 import UnityOutputProto
+from pt_mlagents_envs.communicator_objects.capabilities_pb2 import UnityRLCapabilitiesProto
+from pt_mlagents_envs.communicator_objects.unity_rl_initialization_input_pb2 import (
     UnityRLInitializationInputProto,
 )
 
-from mlagents_envs.communicator_objects.unity_input_pb2 import UnityInputProto
+from pt_mlagents_envs.communicator_objects.unity_input_pb2 import UnityInputProto
 
 from .rpc_communicator import RpcCommunicator
 import signal
@@ -204,7 +204,7 @@ class UnityEnvironment(BaseEnv):
         rl_init_parameters_in = UnityRLInitializationInputProto(
             seed=seed,
             communication_version=self.API_VERSION,
-            package_version=mlagents_envs.__version__,
+            package_version=pt_mlagents_envs.__version__,
             capabilities=UnityEnvironment._get_capabilities_proto(),
         )
         try:

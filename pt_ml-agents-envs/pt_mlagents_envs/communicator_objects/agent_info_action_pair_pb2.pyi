@@ -8,12 +8,12 @@ from google.protobuf.message import (
     Message as google___protobuf___message___Message,
 )
 
-from mlagents_envs.communicator_objects.agent_action_pb2 import (
-    AgentActionProto as mlagents_envs___communicator_objects___agent_action_pb2___AgentActionProto,
+from pt_mlagents_envs.communicator_objects.agent_action_pb2 import (
+    AgentActionProto as pt_mlagents_envs___communicator_objects___agent_action_pb2___AgentActionProto,
 )
 
-from mlagents_envs.communicator_objects.agent_info_pb2 import (
-    AgentInfoProto as mlagents_envs___communicator_objects___agent_info_pb2___AgentInfoProto,
+from pt_mlagents_envs.communicator_objects.agent_info_pb2 import (
+    AgentInfoProto as pt_mlagents_envs___communicator_objects___agent_info_pb2___AgentInfoProto,
 )
 
 from typing import (
@@ -35,15 +35,15 @@ class AgentInfoActionPairProto(google___protobuf___message___Message):
     DESCRIPTOR: google___protobuf___descriptor___Descriptor = ...
 
     @property
-    def agent_info(self) -> mlagents_envs___communicator_objects___agent_info_pb2___AgentInfoProto: ...
+    def agent_info(self) -> pt_mlagents_envs___communicator_objects___agent_info_pb2___AgentInfoProto: ...
 
     @property
-    def action_info(self) -> mlagents_envs___communicator_objects___agent_action_pb2___AgentActionProto: ...
+    def action_info(self) -> pt_mlagents_envs___communicator_objects___agent_action_pb2___AgentActionProto: ...
 
     def __init__(self,
         *,
-        agent_info : typing___Optional[mlagents_envs___communicator_objects___agent_info_pb2___AgentInfoProto] = None,
-        action_info : typing___Optional[mlagents_envs___communicator_objects___agent_action_pb2___AgentActionProto] = None,
+        agent_info : typing___Optional[pt_mlagents_envs___communicator_objects___agent_info_pb2___AgentInfoProto] = None,
+        action_info : typing___Optional[pt_mlagents_envs___communicator_objects___agent_action_pb2___AgentActionProto] = None,
         ) -> None: ...
     @classmethod
     def FromString(cls, s: builtin___bytes) -> AgentInfoActionPairProto: ...

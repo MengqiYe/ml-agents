@@ -1,5 +1,5 @@
-from mlagents_envs.side_channel import SideChannel, OutgoingMessage, IncomingMessage
-from mlagents_envs.exception import (
+from pt_mlagents_envs.side_channel import SideChannel, OutgoingMessage, IncomingMessage
+from pt_mlagents_envs.exception import (
     UnityCommunicationException,
     UnitySideChannelException,
 )

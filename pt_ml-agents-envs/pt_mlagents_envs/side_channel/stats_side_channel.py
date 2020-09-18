@@ -1,4 +1,4 @@
-from mlagents_envs.side_channel import SideChannel, IncomingMessage
+from pt_mlagents_envs.side_channel import SideChannel, IncomingMessage
 import uuid
 from typing import Dict, Tuple
 from enum import Enum

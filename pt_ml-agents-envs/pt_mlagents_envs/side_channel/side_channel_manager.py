@@ -1,9 +1,9 @@
 import uuid
 import struct
 from typing import Dict, Optional, List
-from mlagents_envs.side_channel import SideChannel, IncomingMessage
-from mlagents_envs.exception import UnityEnvironmentException
-from mlagents_envs.logging_util import get_logger
+from pt_mlagents_envs.side_channel import SideChannel, IncomingMessage
+from pt_mlagents_envs.exception import UnityEnvironmentException
+from pt_mlagents_envs.logging_util import get_logger
 
 
 class SideChannelManager:

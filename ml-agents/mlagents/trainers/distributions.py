@@ -165,7 +165,7 @@ class GaussianDistribution(OutputDistribution):
         # Make entropy the right shape
         return tf.ones_like(tf.reshape(encoded.mu[:, 0], [-1])) * single_dim_entropy
 
-    def _do_squash_correction_for_tanh(self, probs, squashed_policy):
+    def GaussianDistribution(self, probs, squashed_policy):
         """
         Adjust probabilities for squashed sample before output
         """

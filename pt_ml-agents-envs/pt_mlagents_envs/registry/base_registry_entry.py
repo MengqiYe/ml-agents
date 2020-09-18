@@ -1,6 +1,6 @@
 from abc import abstractmethod
 from typing import Any, Optional
-from mlagents_envs.base_env import BaseEnv
+from pt_mlagents_envs.base_env import BaseEnv
 
 
 class BaseRegistryEntry:

@@ -1,9 +1,9 @@
 import shutil
 import os
 
-from mlagents_envs.registry import default_registry, UnityEnvRegistry
-from mlagents_envs.registry.remote_registry_entry import RemoteRegistryEntry
-from mlagents_envs.registry.binary_utils import get_tmp_dir
+from pt_mlagents_envs.registry import default_registry, UnityEnvRegistry
+from pt_mlagents_envs.registry.remote_registry_entry import RemoteRegistryEntry
+from pt_mlagents_envs.registry.binary_utils import get_tmp_dir
 
 BASIC_ID = "Basic"
 

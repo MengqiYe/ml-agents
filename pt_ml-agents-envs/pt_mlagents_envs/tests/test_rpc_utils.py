@@ -3,25 +3,25 @@ import numpy as np
 import pytest
 from typing import List, Tuple
 
-from mlagents_envs.communicator_objects.agent_info_pb2 import AgentInfoProto
-from mlagents_envs.communicator_objects.observation_pb2 import (
+from pt_mlagents_envs.communicator_objects.agent_info_pb2 import AgentInfoProto
+from pt_mlagents_envs.communicator_objects.observation_pb2 import (
     ObservationProto,
     NONE,
     PNG,
 )
-from mlagents_envs.communicator_objects.brain_parameters_pb2 import BrainParametersProto
-from mlagents_envs.communicator_objects.agent_info_action_pair_pb2 import (
+from pt_mlagents_envs.communicator_objects.brain_parameters_pb2 import BrainParametersProto
+from pt_mlagents_envs.communicator_objects.agent_info_action_pair_pb2 import (
     AgentInfoActionPairProto,
 )
-from mlagents_envs.communicator_objects.agent_action_pb2 import AgentActionProto
-from mlagents_envs.base_env import (
+from pt_mlagents_envs.communicator_objects.agent_action_pb2 import AgentActionProto
+from pt_mlagents_envs.base_env import (
     BehaviorSpec,
     ActionType,
     DecisionSteps,
     TerminalSteps,
 )
-from mlagents_envs.exception import UnityObservationException
-from mlagents_envs.rpc_utils import (
+from pt_mlagents_envs.exception import UnityObservationException
+from pt_mlagents_envs.rpc_utils import (
     behavior_spec_from_proto,
     process_pixels,
     _process_visual_observation,

@@ -44,8 +44,8 @@ TRAINING_STATUS_FILE_NAME = "training_status.json"
 def get_version_string() -> str:
     # pylint: disable=no-member
     return f""" Version information:
-  ml-agents: {pt_mlagents.trainers.__version__},
-  ml-agents-envs: {pt_mlagents_envs.__version__},
+  pt_ml-agents: {pt_mlagents.trainers.__version__},
+  pt_ml-agents-envs: {pt_mlagents_envs.__version__},
   Communicator API: {UnityEnvironment.API_VERSION},
   TensorFlow: {pt_utils.torch.__version__}"""
 

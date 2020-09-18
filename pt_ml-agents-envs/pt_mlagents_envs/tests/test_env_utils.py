@@ -1,8 +1,8 @@
 from unittest import mock
 import pytest
-from mlagents_envs.env_utils import validate_environment_path, launch_executable
-from mlagents_envs.exception import UnityEnvironmentException
-from mlagents_envs.logging_util import (
+from pt_mlagents_envs.env_utils import validate_environment_path, launch_executable
+from pt_mlagents_envs.exception import UnityEnvironmentException
+from pt_mlagents_envs.logging_util import (
     set_log_level,
     get_logger,
     INFO,
@@ -36,7 +36,7 @@ def test_validate_path_empty(glob_mock, platform_mock):
     assert path is None
 
 
-@mock.patch("mlagents_envs.env_utils.get_platform")
+@mock.patch("pt_mlagents_envs.env_utils.get_platform")
 @mock.patch("glob.glob")
 def test_validate_path(glob_mock, platform_mock):
     glob_mock.side_effect = mock_glob_method

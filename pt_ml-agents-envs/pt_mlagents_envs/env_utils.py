@@ -3,8 +3,8 @@ import os
 import subprocess
 from sys import platform
 from typing import Optional, List
-from mlagents_envs.logging_util import get_logger
-from mlagents_envs.exception import UnityEnvironmentException
+from pt_mlagents_envs.logging_util import get_logger
+from pt_mlagents_envs.exception import UnityEnvironmentException
 
 
 def get_platform():

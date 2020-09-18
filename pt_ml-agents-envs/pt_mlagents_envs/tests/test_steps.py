@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 
-from mlagents_envs.base_env import (
+from pt_mlagents_envs.base_env import (
     DecisionSteps,
     TerminalSteps,
     ActionType,

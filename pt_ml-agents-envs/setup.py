@@ -2,10 +2,10 @@ import os
 import sys
 from setuptools import setup, find_packages
 from setuptools.command.install import install
-import mlagents_envs
+import pt_mlagents_envs
 
-VERSION = mlagents_envs.__version__
-EXPECTED_TAG = mlagents_envs.__release_tag__
+VERSION = pt_mlagents_envs.__version__
+EXPECTED_TAG = pt_mlagents_envs.__release_tag__
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -30,7 +30,7 @@ class VerifyVersionCommand(install):
 
 
 setup(
-    name="mlagents_envs",
+    name="pl_mlagents_envs",
     version=VERSION,
     description="Unity Machine Learning Agents Interface",
     url="https://github.com/Unity-Technologies/ml-agents",
@@ -42,17 +42,18 @@ setup(
         "License :: OSI Approved :: Apache Software License",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
     ],
     packages=find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests"]),
     zip_safe=False,
     install_requires=[
-        "cloudpickle",
-        "grpcio>=1.11.0",
-        "numpy>=1.14.1,<1.19.0",
-        "Pillow>=4.2.1",
-        "protobuf>=3.6",
-        "pyyaml>=3.1.0",
+        # "cloudpickle",
+        # "grpcio>=1.11.0",
+        # "numpy>=1.14.1,<1.19.0",
+        # "Pillow>=4.2.1",
+        # "protobuf>=3.6",
+        # "pyyaml>=3.1.0",
     ],
-    python_requires=">=3.5",
+    python_requires=">=3.8",
     cmdclass={"verify": VerifyVersionCommand},
 )

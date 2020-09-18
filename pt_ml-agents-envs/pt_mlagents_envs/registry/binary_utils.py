@@ -11,7 +11,7 @@ from zipfile import ZipFile
 from sys import platform
 from typing import Tuple, Optional, Dict, Any
 
-from mlagents_envs.logging_util import get_logger
+from pt_mlagents_envs.logging_util import get_logger
 
 logger = get_logger(__name__)
 

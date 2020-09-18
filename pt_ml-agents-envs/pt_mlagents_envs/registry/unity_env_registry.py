@@ -1,11 +1,11 @@
 from typing import Dict, Iterator, Any, List
 from collections.abc import Mapping
-from mlagents_envs.registry.base_registry_entry import BaseRegistryEntry
-from mlagents_envs.registry.binary_utils import (
+from pt_mlagents_envs.registry.base_registry_entry import BaseRegistryEntry
+from pt_mlagents_envs.registry.binary_utils import (
     load_local_manifest,
     load_remote_manifest,
 )
-from mlagents_envs.registry.remote_registry_entry import RemoteRegistryEntry
+from pt_mlagents_envs.registry.remote_registry_entry import RemoteRegistryEntry
 
 
 class UnityEnvRegistry(Mapping):

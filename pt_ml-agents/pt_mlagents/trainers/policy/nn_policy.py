@@ -86,8 +86,8 @@ class NNPolicy(PTPolicy):
 
         # self.create_input_placeholders()
         encoded = self._create_encoder(
-            self.visual_in,
-            self.processed_vector_in,
+            [],  # self.visual_in,
+            torch.FloatTensor(size=(1, 8)),  # self.processed_vector_in,
             self.h_size,
             self.num_layers,
             self.vis_encode_type,
@@ -162,8 +162,8 @@ class NNPolicy(PTPolicy):
         :return: The hidden layer (torch.Tensor) after the encoder.
         """
         return ModelUtils.create_observation_streams(
-            self.visual_in,
-            self.processed_vector_in,
+            visual_in,
+            vector_in,
             1,
             h_size,
             num_layers,
@@ -176,7 +176,7 @@ class NNPolicy(PTPolicy):
             tanh_squash: bool = False,
             reparameterize: bool = False,
             condition_sigma_on_obs: bool = True,
-    ) -> None:
+    ) -> torch.nn.Sequential:
         """
         Creates Continuous control actor-critic model.
         :param h_size: Size of hidden linear layers.
@@ -185,6 +185,10 @@ class NNPolicy(PTPolicy):
         :param tanh_squash: Whether to use a tanh function, or a clipped output.
         :param reparameterize: Whether we are using the resampling trick to update the policy.
         """
+
+        modules = torch.nn.Sequential()
+
+
         if self.use_recurrent:
             self.memory_in = torch.placeholder(
                 shape=[None, self.m_size], dtype=torch.float32, name="recurrent_in"
@@ -197,14 +201,15 @@ class NNPolicy(PTPolicy):
         else:
             hidden_policy = encoded
 
-        with torch.variable_scope("policy"):
-            distribution = GaussianDistribution(
-                hidden_policy,
-                self.act_size,
-                reparameterize=reparameterize,
-                tanh_squash=tanh_squash,
-                condition_sigma=condition_sigma_on_obs,
-            )
+        # with torch.variable_scope("policy"):
+        distribution = GaussianDistribution(
+            hidden_policy,
+            self.act_size,
+            reparameterize=reparameterize,
+            tanh_squash=tanh_squash,
+            condition_sigma=condition_sigma_on_obs,
+        )
+        modules.add_module("gaussian_distribution", distribution)
 
         if tanh_squash:
             self.output_pre = distribution.sample
@@ -212,12 +217,12 @@ class NNPolicy(PTPolicy):
         else:
             self.output_pre = distribution.sample
             # Clip and scale output to ensure actions are always within [-1, 1] range.
-            output_post = torch.clip_by_value(self.output_pre, -3, 3) / 3
-            self.output = torch.identity(output_post, name="action")
+            output_post = torch.clamp(self.output_pre, -3, 3) / 3
+            self.output = torch.Tensor(output_post, name="action")
 
-        self.selected_actions = torch.stop_gradient(self.output)
+        self.selected_actions = self.output.detach()
 
-        self.all_log_probs = torch.identity(distribution.log_probs, name="action_probs")
+        self.all_log_probs = torch.Tensor(distribution.log_probs, name="action_probs")
         self.entropy = distribution.entropy
 
         # We keep these tensors the same name, but use new nodes to keep code parallelism with discrete control.

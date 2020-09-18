@@ -7,13 +7,13 @@ from multiprocessing import Pipe
 from concurrent.futures import ThreadPoolExecutor
 
 from .communicator import Communicator
-from mlagents_envs.communicator_objects.unity_to_external_pb2_grpc import (
+from pt_mlagents_envs.communicator_objects.unity_to_external_pb2_grpc import (
     UnityToExternalProtoServicer,
     add_UnityToExternalProtoServicer_to_server,
 )
-from mlagents_envs.communicator_objects.unity_message_pb2 import UnityMessageProto
-from mlagents_envs.communicator_objects.unity_input_pb2 import UnityInputProto
-from mlagents_envs.communicator_objects.unity_output_pb2 import UnityOutputProto
+from pt_mlagents_envs.communicator_objects.unity_message_pb2 import UnityMessageProto
+from pt_mlagents_envs.communicator_objects.unity_input_pb2 import UnityInputProto
+from pt_mlagents_envs.communicator_objects.unity_output_pb2 import UnityOutputProto
 from .exception import UnityTimeOutException, UnityWorkerInUseException
 
 

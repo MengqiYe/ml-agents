@@ -12,12 +12,12 @@ from google.protobuf.message import (
     Message as google___protobuf___message___Message,
 )
 
-from mlagents_envs.communicator_objects.agent_action_pb2 import (
-    AgentActionProto as mlagents_envs___communicator_objects___agent_action_pb2___AgentActionProto,
+from pt_mlagents_envs.communicator_objects.agent_action_pb2 import (
+    AgentActionProto as pt_mlagents_envs___communicator_objects___agent_action_pb2___AgentActionProto,
 )
 
-from mlagents_envs.communicator_objects.command_pb2 import (
-    CommandProto as mlagents_envs___communicator_objects___command_pb2___CommandProto,
+from pt_mlagents_envs.communicator_objects.command_pb2 import (
+    CommandProto as pt_mlagents_envs___communicator_objects___command_pb2___CommandProto,
 )
 
 from typing import (
@@ -45,11 +45,11 @@ class UnityRLInputProto(google___protobuf___message___Message):
         DESCRIPTOR: google___protobuf___descriptor___Descriptor = ...
 
         @property
-        def value(self) -> google___protobuf___internal___containers___RepeatedCompositeFieldContainer[mlagents_envs___communicator_objects___agent_action_pb2___AgentActionProto]: ...
+        def value(self) -> google___protobuf___internal___containers___RepeatedCompositeFieldContainer[pt_mlagents_envs___communicator_objects___agent_action_pb2___AgentActionProto]: ...
 
         def __init__(self,
             *,
-            value : typing___Optional[typing___Iterable[mlagents_envs___communicator_objects___agent_action_pb2___AgentActionProto]] = None,
+            value : typing___Optional[typing___Iterable[pt_mlagents_envs___communicator_objects___agent_action_pb2___AgentActionProto]] = None,
             ) -> None: ...
         @classmethod
         def FromString(cls, s: builtin___bytes) -> UnityRLInputProto.ListAgentActionProto: ...
@@ -83,7 +83,7 @@ class UnityRLInputProto(google___protobuf___message___Message):
             def HasField(self, field_name: typing_extensions___Literal[u"value",b"value"]) -> builtin___bool: ...
             def ClearField(self, field_name: typing_extensions___Literal[u"key",b"key",u"value",b"value"]) -> None: ...
 
-    command = ... # type: mlagents_envs___communicator_objects___command_pb2___CommandProto
+    command = ... # type: pt_mlagents_envs___communicator_objects___command_pb2___CommandProto
     side_channel = ... # type: builtin___bytes
 
     @property
@@ -92,7 +92,7 @@ class UnityRLInputProto(google___protobuf___message___Message):
     def __init__(self,
         *,
         agent_actions : typing___Optional[typing___Mapping[typing___Text, UnityRLInputProto.ListAgentActionProto]] = None,
-        command : typing___Optional[mlagents_envs___communicator_objects___command_pb2___CommandProto] = None,
+        command : typing___Optional[pt_mlagents_envs___communicator_objects___command_pb2___CommandProto] = None,
         side_channel : typing___Optional[builtin___bytes] = None,
         ) -> None: ...
     @classmethod

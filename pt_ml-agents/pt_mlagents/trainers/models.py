@@ -26,6 +26,24 @@ class Route(torch.nn.Module):
         pass
 
 
+class ClampExp(torch.nn.Module):
+    def __init__(self, min, max):
+        super(ClampExp, self).__init__()
+
+    def forward(self, x: torch.Tensor):
+        return x.clamp(self.min, self.max).exp()
+
+
+
+class Swish(torch.nn.Module):
+    def __init__(self):
+        super(Swish, self).__init__()
+
+    def forward(self, input_activation: torch.Tensor) -> torch.Tensor:
+        """Swish activation function. For more info: https://arxiv.org/abs/1710.05941"""
+        return torch.multiply(input_activation, torch.nn.sigmoid(input_activation))
+
+
 class Tensor3DShape(NamedTuple):
     height: int
     width: int
@@ -103,7 +121,8 @@ class ModelUtils:
 
     @staticmethod
     def scaled_init(scale):
-        return torch.initializers.variance_scaling(scale)
+        # return tf.initializers.variance_scaling(scale)
+        return torch.nn.init.uniform_(tensor=torch.empty(3, 5), a=0, b=scale)
 
     @staticmethod
     def swish(input_activation: torch.Tensor) -> torch.Tensor:
@@ -283,7 +302,7 @@ class ModelUtils:
     def create_vector_observation_encoder(
             in_size: int,
             h_size: int,
-            activation: ActivationFunction,
+            activation: torch.nn.Module,
             num_layers: int,
             scope: str,
             reuse: bool,
@@ -309,7 +328,7 @@ class ModelUtils:
         modules = torch.nn.Sequential()
         for i in range(num_layers):
             modules.add_module(f"{scope}/hidden_{i}", torch.nn.Linear(in_size, h_size))
-            modules.add_module(f"{scope}/activation_{i}", activation)
+            modules.add_module(f"{scope}/activation_{i}", Swish())
             in_size = h_size
 
         return modules
@@ -534,8 +553,8 @@ class ModelUtils:
         )
         return (
             output,
-            torch.concat([normalized_probs[k] for k in range(len(action_size))], axis=1),
-            torch.concat(
+            torch.cat([normalized_probs[k] for k in range(len(action_size))], axis=1),
+            torch.cat(
                 [
                     torch.log(normalized_probs[k] + EPSILON)
                     for k in range(len(action_size))
@@ -576,7 +595,6 @@ class ModelUtils:
             the scopes for each of the streams. None if all under the same PT scope.
         :return: List of encoded streams.
         """
-        activation_fn = ModelUtils.swish
         in_size = vector_in.shape[1]
 
         modules = torch.nn.Sequential()
@@ -586,13 +604,12 @@ class ModelUtils:
             hidden_state, hidden_visual = None, None
             _scope_add = stream_scopes[i] if stream_scopes else ""
             if len(visual_in) > 0:
-
                 for j, vis_in in enumerate(visual_in):
                     ModelUtils._check_resolution_for_encoder(vis_in, vis_encode_type)
                     encoded_visual = create_encoder_func(
                         vis_in,
                         h_size,
-                        activation_fn,
+                        Swish(),
                         num_layers,
                         f"{_scope_add}main_graph_{i}_encoder{j}",  # scope
                         False,  # reuse
@@ -601,12 +618,12 @@ class ModelUtils:
 
                 hidden_visual = Route(visual_encoders, axis=1)
 
-            if vector_in.get_shape()[-1] > 0:
+            if vector_in.shape[-1] > 0:
                 # Don't encode non-existant or 0-shape inputs
                 hidden_state = ModelUtils.create_vector_observation_encoder(
                     in_size,
                     h_size,
-                    activation_fn,
+                    Swish,
                     num_layers,
                     scope=f"{_scope_add}main_graph_{i}",
                     reuse=False,
@@ -622,7 +639,7 @@ class ModelUtils:
                     "No valid network configuration possible. "
                     "There are no states or observations in this brain"
                 )
-            modules.append(final_hidden)
+            modules.add_module(f"{_scope_add}main_graph_{i}", final_hidden)
         return modules
 
     @staticmethod

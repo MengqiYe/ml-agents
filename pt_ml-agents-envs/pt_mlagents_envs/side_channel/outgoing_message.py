@@ -1,7 +1,7 @@
 from typing import List
 import struct
 
-from mlagents_envs.logging_util import get_logger
+from pt_mlagents_envs.logging_util import get_logger
 
 logger = get_logger(__name__)
 

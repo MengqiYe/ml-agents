@@ -12,12 +12,12 @@ from google.protobuf.message import (
     Message as google___protobuf___message___Message,
 )
 
-from mlagents_envs.communicator_objects.brain_parameters_pb2 import (
-    BrainParametersProto as mlagents_envs___communicator_objects___brain_parameters_pb2___BrainParametersProto,
+from pt_mlagents_envs.communicator_objects.brain_parameters_pb2 import (
+    BrainParametersProto as pt_mlagents_envs___communicator_objects___brain_parameters_pb2___BrainParametersProto,
 )
 
-from mlagents_envs.communicator_objects.capabilities_pb2 import (
-    UnityRLCapabilitiesProto as mlagents_envs___communicator_objects___capabilities_pb2___UnityRLCapabilitiesProto,
+from pt_mlagents_envs.communicator_objects.capabilities_pb2 import (
+    UnityRLCapabilitiesProto as pt_mlagents_envs___communicator_objects___capabilities_pb2___UnityRLCapabilitiesProto,
 )
 
 from typing import (
@@ -45,19 +45,19 @@ class UnityRLInitializationOutputProto(google___protobuf___message___Message):
     package_version = ... # type: typing___Text
 
     @property
-    def brain_parameters(self) -> google___protobuf___internal___containers___RepeatedCompositeFieldContainer[mlagents_envs___communicator_objects___brain_parameters_pb2___BrainParametersProto]: ...
+    def brain_parameters(self) -> google___protobuf___internal___containers___RepeatedCompositeFieldContainer[pt_mlagents_envs___communicator_objects___brain_parameters_pb2___BrainParametersProto]: ...
 
     @property
-    def capabilities(self) -> mlagents_envs___communicator_objects___capabilities_pb2___UnityRLCapabilitiesProto: ...
+    def capabilities(self) -> pt_mlagents_envs___communicator_objects___capabilities_pb2___UnityRLCapabilitiesProto: ...
 
     def __init__(self,
         *,
         name : typing___Optional[typing___Text] = None,
         communication_version : typing___Optional[typing___Text] = None,
         log_path : typing___Optional[typing___Text] = None,
-        brain_parameters : typing___Optional[typing___Iterable[mlagents_envs___communicator_objects___brain_parameters_pb2___BrainParametersProto]] = None,
+        brain_parameters : typing___Optional[typing___Iterable[pt_mlagents_envs___communicator_objects___brain_parameters_pb2___BrainParametersProto]] = None,
         package_version : typing___Optional[typing___Text] = None,
-        capabilities : typing___Optional[mlagents_envs___communicator_objects___capabilities_pb2___UnityRLCapabilitiesProto] = None,
+        capabilities : typing___Optional[pt_mlagents_envs___communicator_objects___capabilities_pb2___UnityRLCapabilitiesProto] = None,
         ) -> None: ...
     @classmethod
     def FromString(cls, s: builtin___bytes) -> UnityRLInitializationOutputProto: ...

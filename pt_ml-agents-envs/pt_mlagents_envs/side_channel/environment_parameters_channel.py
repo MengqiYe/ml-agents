@@ -1,5 +1,5 @@
-from mlagents_envs.side_channel import SideChannel, IncomingMessage, OutgoingMessage
-from mlagents_envs.exception import UnityCommunicationException
+from pt_mlagents_envs.side_channel import SideChannel, IncomingMessage, OutgoingMessage
+from pt_mlagents_envs.exception import UnityCommunicationException
 import uuid
 from enum import IntEnum
 from typing import List, Tuple

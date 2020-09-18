@@ -1,19 +1,19 @@
 from .communicator import Communicator
 from .environment import UnityEnvironment
-from mlagents_envs.communicator_objects.unity_rl_output_pb2 import UnityRLOutputProto
-from mlagents_envs.communicator_objects.brain_parameters_pb2 import BrainParametersProto
-from mlagents_envs.communicator_objects.unity_rl_initialization_output_pb2 import (
+from pt_mlagents_envs.communicator_objects.unity_rl_output_pb2 import UnityRLOutputProto
+from pt_mlagents_envs.communicator_objects.brain_parameters_pb2 import BrainParametersProto
+from pt_mlagents_envs.communicator_objects.unity_rl_initialization_output_pb2 import (
     UnityRLInitializationOutputProto,
 )
-from mlagents_envs.communicator_objects.unity_input_pb2 import UnityInputProto
-from mlagents_envs.communicator_objects.unity_output_pb2 import UnityOutputProto
-from mlagents_envs.communicator_objects.agent_info_pb2 import AgentInfoProto
-from mlagents_envs.communicator_objects.observation_pb2 import (
+from pt_mlagents_envs.communicator_objects.unity_input_pb2 import UnityInputProto
+from pt_mlagents_envs.communicator_objects.unity_output_pb2 import UnityOutputProto
+from pt_mlagents_envs.communicator_objects.agent_info_pb2 import AgentInfoProto
+from pt_mlagents_envs.communicator_objects.observation_pb2 import (
     ObservationProto,
     NONE as COMPRESSION_TYPE_NONE,
     PNG as COMPRESSION_TYPE_PNG,
 )
-from mlagents_envs.communicator_objects.space_type_pb2 import discrete, continuous
+from pt_mlagents_envs.communicator_objects.space_type_pb2 import discrete, continuous
 
 
 class MockCommunicator(Communicator):

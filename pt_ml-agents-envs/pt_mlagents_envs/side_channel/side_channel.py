@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 from typing import List
 import uuid
 
-from mlagents_envs.side_channel import IncomingMessage, OutgoingMessage
-from mlagents_envs.logging_util import get_logger
+from pt_mlagents_envs.side_channel import IncomingMessage, OutgoingMessage
+from pt_mlagents_envs.logging_util import get_logger
 
 logger = get_logger(__name__)
 

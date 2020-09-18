@@ -3,20 +3,20 @@ import pytest
 
 import numpy as np
 
-from mlagents_envs.environment import UnityEnvironment
-from mlagents_envs.base_env import DecisionSteps, TerminalSteps
-from mlagents_envs.exception import UnityEnvironmentException, UnityActionException
-from mlagents_envs.mock_communicator import MockCommunicator
+from pt_mlagents_envs.environment import UnityEnvironment
+from pt_mlagents_envs.base_env import DecisionSteps, TerminalSteps
+from pt_mlagents_envs.exception import UnityEnvironmentException, UnityActionException
+from pt_mlagents_envs.mock_communicator import MockCommunicator
 
 
-@mock.patch("mlagents_envs.environment.UnityEnvironment._get_communicator")
+@mock.patch("pt_mlagents_envs.environment.UnityEnvironment._get_communicator")
 def test_handles_bad_filename(get_communicator):
     with pytest.raises(UnityEnvironmentException):
         UnityEnvironment(" ")
 
 
-@mock.patch("mlagents_envs.env_utils.launch_executable")
-@mock.patch("mlagents_envs.environment.UnityEnvironment._get_communicator")
+@mock.patch("pt_mlagents_envs.env_utils.launch_executable")
+@mock.patch("pt_mlagents_envs.environment.UnityEnvironment._get_communicator")
 def test_initialization(mock_communicator, mock_launcher):
     mock_communicator.return_value = MockCommunicator(
         discrete_action=False, visual_inputs=0
@@ -37,8 +37,8 @@ def test_initialization(mock_communicator, mock_launcher):
         (None, None, UnityEnvironment.DEFAULT_EDITOR_PORT),
     ],
 )
-@mock.patch("mlagents_envs.env_utils.launch_executable")
-@mock.patch("mlagents_envs.environment.UnityEnvironment._get_communicator")
+@mock.patch("pt_mlagents_envs.env_utils.launch_executable")
+@mock.patch("pt_mlagents_envs.environment.UnityEnvironment._get_communicator")
 def test_port_defaults(
     mock_communicator, mock_launcher, base_port, file_name, expected
 ):
@@ -49,8 +49,8 @@ def test_port_defaults(
     assert expected == env._port
 
 
-@mock.patch("mlagents_envs.env_utils.launch_executable")
-@mock.patch("mlagents_envs.environment.UnityEnvironment._get_communicator")
+@mock.patch("pt_mlagents_envs.env_utils.launch_executable")
+@mock.patch("pt_mlagents_envs.environment.UnityEnvironment._get_communicator")
 def test_log_file_path_is_set(mock_communicator, mock_launcher):
     mock_communicator.return_value = MockCommunicator()
     env = UnityEnvironment(
@@ -61,8 +61,8 @@ def test_log_file_path_is_set(mock_communicator, mock_launcher):
     assert args[log_file_index + 1] == "./some-log-folder-path/Player-0.log"
 
 
-@mock.patch("mlagents_envs.env_utils.launch_executable")
-@mock.patch("mlagents_envs.environment.UnityEnvironment._get_communicator")
+@mock.patch("pt_mlagents_envs.env_utils.launch_executable")
+@mock.patch("pt_mlagents_envs.environment.UnityEnvironment._get_communicator")
 def test_reset(mock_communicator, mock_launcher):
     mock_communicator.return_value = MockCommunicator(
         discrete_action=False, visual_inputs=0
@@ -84,8 +84,8 @@ def test_reset(mock_communicator, mock_launcher):
         assert (n_agents,) + shape == obs.shape
 
 
-@mock.patch("mlagents_envs.env_utils.launch_executable")
-@mock.patch("mlagents_envs.environment.UnityEnvironment._get_communicator")
+@mock.patch("pt_mlagents_envs.env_utils.launch_executable")
+@mock.patch("pt_mlagents_envs.environment.UnityEnvironment._get_communicator")
 def test_step(mock_communicator, mock_launcher):
     mock_communicator.return_value = MockCommunicator(
         discrete_action=False, visual_inputs=0
@@ -122,8 +122,8 @@ def test_step(mock_communicator, mock_launcher):
     assert 2 in terminal_steps
 
 
-@mock.patch("mlagents_envs.env_utils.launch_executable")
-@mock.patch("mlagents_envs.environment.UnityEnvironment._get_communicator")
+@mock.patch("pt_mlagents_envs.env_utils.launch_executable")
+@mock.patch("pt_mlagents_envs.environment.UnityEnvironment._get_communicator")
 def test_close(mock_communicator, mock_launcher):
     comm = MockCommunicator(discrete_action=False, visual_inputs=0)
     mock_communicator.return_value = comm

@@ -1,6 +1,6 @@
 from unittest import mock
 
-from mlagents_envs import timers
+from pt_mlagents_envs import timers
 
 
 @timers.timed
@@ -11,7 +11,7 @@ def decorated_func(x: int = 0, y: float = 1.0) -> str:
 
 def test_timers() -> None:
     test_timer = timers.TimerStack()
-    with mock.patch("mlagents_envs.timers._get_thread_timer", return_value=test_timer):
+    with mock.patch("pt_mlagents_envs.timers._get_thread_timer", return_value=test_timer):
         # First, run some simple code
         with timers.hierarchical_timer("top_level"):
             for i in range(3):

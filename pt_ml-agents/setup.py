@@ -57,26 +57,26 @@ setup(
     zip_safe=False,
     install_requires=[
         # Test-only dependencies should go in test_requirements.txt, not here.
-        "grpcio>=1.11.0",
-        "h5py>=2.9.0",
-        "mlagents_envs=={}".format(VERSION),
-        "numpy>=1.13.3,<2.0",
-        "Pillow>=4.2.1",
-        "protobuf>=3.6",
-        "pyyaml>=3.1.0",
-        "tensorflow-gpu>=1.7,<3.0",
-        "cattrs>=1.0.0",
-        "attrs>=19.3.0",
-        'pypiwin32==223;platform_system=="Windows"',
-        # We don't actually need six, but tensorflow does, and pip seems
-        # to get confused and install the wrong version.
-        "six>=1.12.0",
+        # "grpcio>=1.11.0",
+        # "h5py>=2.9.0",
+        # "mlagents_envs=={}".format(VERSION),
+        # "numpy>=1.13.3,<2.0",
+        # "Pillow>=4.2.1",
+        # "protobuf>=3.6",
+        # "pyyaml>=3.1.0",
+        # "tensorflow-gpu>=1.7,<3.0",
+        # "cattrs>=1.0.0",
+        # "attrs>=19.3.0",
+        # 'pypiwin32==223;platform_system=="Windows"',
+        # # We don't actually need six, but tensorflow does, and pip seems
+        # # to get confused and install the wrong version.
+        # "six>=1.12.0",
     ],
-    python_requires=">=3.6.1",
+    python_requires=">=3.8",
     entry_points={
         "console_scripts": [
             "pt_mlagents-learn=pt_mlagents.trainers.learn:main",
-            "mlagents-run-experiment=pt_mlagents.trainers.run_experiment:main",
+            "pt_mlagents-run-experiment=pt_mlagents.trainers.run_experiment:main",
         ]
     },
     cmdclass={"verify": VerifyVersionCommand},

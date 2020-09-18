@@ -8,8 +8,8 @@ from google.protobuf.message import (
     Message as google___protobuf___message___Message,
 )
 
-from mlagents_envs.communicator_objects.capabilities_pb2 import (
-    UnityRLCapabilitiesProto as mlagents_envs___communicator_objects___capabilities_pb2___UnityRLCapabilitiesProto,
+from pt_mlagents_envs.communicator_objects.capabilities_pb2 import (
+    UnityRLCapabilitiesProto as pt_mlagents_envs___communicator_objects___capabilities_pb2___UnityRLCapabilitiesProto,
 )
 
 from typing import (
@@ -35,14 +35,14 @@ class UnityRLInitializationInputProto(google___protobuf___message___Message):
     package_version = ... # type: typing___Text
 
     @property
-    def capabilities(self) -> mlagents_envs___communicator_objects___capabilities_pb2___UnityRLCapabilitiesProto: ...
+    def capabilities(self) -> pt_mlagents_envs___communicator_objects___capabilities_pb2___UnityRLCapabilitiesProto: ...
 
     def __init__(self,
         *,
         seed : typing___Optional[builtin___int] = None,
         communication_version : typing___Optional[typing___Text] = None,
         package_version : typing___Optional[typing___Text] = None,
-        capabilities : typing___Optional[mlagents_envs___communicator_objects___capabilities_pb2___UnityRLCapabilitiesProto] = None,
+        capabilities : typing___Optional[pt_mlagents_envs___communicator_objects___capabilities_pb2___UnityRLCapabilitiesProto] = None,
         ) -> None: ...
     @classmethod
     def FromString(cls, s: builtin___bytes) -> UnityRLInitializationInputProto: ...
