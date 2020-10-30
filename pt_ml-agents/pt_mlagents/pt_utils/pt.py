@@ -16,7 +16,7 @@ pt_logging = logging
 
 def set_warnings_enabled(is_enabled: bool) -> None:
     """
-    Enable or disable tensorflow warnings (notably, this disables deprecation warnings.
+    Enable or disable pytorch warnings (notably, this disables deprecation warnings.
     :param is_enabled:
     """
     level = pt_logging.WARN if is_enabled else pt_logging.ERROR

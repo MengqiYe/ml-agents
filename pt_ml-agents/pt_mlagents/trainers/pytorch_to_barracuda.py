@@ -23,7 +23,7 @@ if __name__ == "__main__":
     )
     # Te following code can be used as an example of API used from another module
     # convert() is the main entry point for converter
-    import tensorflow_to_barracuda as tf2bc
+    import pytorch_to_barracuda as tf2bc
 
     tf2bc.convert(args.source_file, args.target_file, args.trim_unused_by_output, args)
 
@@ -37,17 +37,17 @@ if __name__ == "__main__":
 # TODO: implement FusedResizeAndPadConv2D
 
 # Important ProtoBuf definitions:
-#    https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/framework/types.proto
-#    https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/framework/tensor.proto
-#    https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/framework/node_def.proto
+#    https://github.com/pytorch/pytorch/blob/master/pytorch/core/framework/types.proto
+#    https://github.com/pytorch/pytorch/blob/master/pytorch/core/framework/tensor.proto
+#    https://github.com/pytorch/pytorch/blob/master/pytorch/core/framework/node_def.proto
 #
 # Node descriptions:
-#    https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/ops/nn_ops.cc
-#    https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/ops/math_ops.cc
-#    https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/ops/random_ops.cc
+#    https://github.com/pytorch/pytorch/blob/master/pytorch/core/ops/nn_ops.cc
+#    https://github.com/pytorch/pytorch/blob/master/pytorch/core/ops/math_ops.cc
+#    https://github.com/pytorch/pytorch/blob/master/pytorch/core/ops/random_ops.cc
 #
 # Class doc:
-#    https://www.tensorflow.org/api_docs/cc/
+#    https://www.pytorch.org/api_docs/cc/
 #
 known_classes = {
     "Dense": Struct(
@@ -588,7 +588,7 @@ def get_attr(node, attr_name, default=None):
         else:
             return default
 
-    # See: https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/framework/attr_value.proto
+    # See: https://github.com/pytorch/pytorch/blob/master/pytorch/core/framework/attr_value.proto
     val = node.attr[attr_name]
 
     if val.HasField("list"):
@@ -807,7 +807,7 @@ def strided_slice(
     strides = strides.astype(np.int32).tolist()
 
     # StridedSlice range and mask descriptions:
-    #   https://www.tensorflow.org/api_docs/cc/class/tensorflow/ops/strided-slice
+    #   https://www.pytorch.org/api_docs/cc/class/pytorch/ops/strided-slice
     # TODO: I don't think elipsis and newaxis would work together well with current implementation
 
     assert len(begin) == len(end)

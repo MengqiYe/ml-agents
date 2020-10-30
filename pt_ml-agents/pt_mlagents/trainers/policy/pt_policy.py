@@ -101,7 +101,7 @@ class PTPolicy(Policy):
         if self.network_settings.memory is not None:
             self.m_size = self.network_settings.memory.memory_size
             self.sequence_length = self.network_settings.memory.sequence_length
-        self._initialize_tensorflow_references()
+        self._initialize_pytorch_references()
         self.load = load
 
     @abc.abstractmethod
@@ -115,7 +115,7 @@ class PTPolicy(Policy):
     @abc.abstractmethod
     def create_pt_graph(self):
         """
-        Builds the tensorflow graph needed for this policy.
+        Builds the pytorch graph needed for this policy.
         """
         pass
 
@@ -432,7 +432,7 @@ class PTPolicy(Policy):
     def use_vec_obs(self):
         return self.vec_obs_size > 0
 
-    def _initialize_tensorflow_references(self):
+    def _initialize_pytorch_references(self):
         self.value_heads: Dict[str, torch.Tensor] = {}
         self.normalization_steps: Optional[torch.Variable] = None
         self.running_mean: Optional[torch.Variable] = None

@@ -24,7 +24,7 @@ class StatusType(Enum):
 class StatusMetaData:
     stats_format_version: str = STATUS_FORMAT_VERSION
     pt_mlagents_version: str = __version__
-    tensorflow_version: str = torch.__version__
+    pytorch_version: str = torch.__version__
 
     def to_dict(self) -> Dict[str, str]:
         return cattr.unstructure(self)
@@ -43,7 +43,7 @@ class StatusMetaData:
             logger.warning(
                 "Checkpoint was loaded from a different version of ML-Agents. Some things may not resume properly."
             )
-        if self.tensorflow_version != other.tensorflow_version:
+        if self.pytorch_version != other.pytorch_version:
             logger.warning(
                 "Tensorflow checkpoint was saved with a different version of Tensorflow. Model may not resume properly."
             )

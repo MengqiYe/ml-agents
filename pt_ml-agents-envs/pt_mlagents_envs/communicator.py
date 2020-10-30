@@ -1,6 +1,6 @@
 from typing import Optional
-from pt_pt_mlagents_envs.communicator_objects.unity_output_pb2 import UnityOutputProto
-from pt_pt_mlagents_envs.communicator_objects.unity_input_pb2 import UnityInputProto
+from pt_mlagents_envs.communicator_objects.unity_output_pb2 import UnityOutputProto
+from pt_mlagents_envs.communicator_objects.unity_input_pb2 import UnityInputProto
 
 
 class Communicator(object):

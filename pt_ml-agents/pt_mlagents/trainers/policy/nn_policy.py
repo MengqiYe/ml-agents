@@ -71,7 +71,7 @@ class NNPolicy(PTPolicy):
 
     def create_pt_graph(self) -> None:
         """
-        Builds the tensorflow graph needed for this policy.
+        Builds the pytorch graph needed for this policy.
         """
         # with self.graph.as_default():
         torch.random.manual_seed(self.seed)
@@ -161,9 +161,12 @@ class NNPolicy(PTPolicy):
         :param vis_encode_type: Type of visual encoder to use if visual input.
         :return: The hidden layer (torch.Tensor) after the encoder.
         """
+        for shape in self.behavior_spec.observation_shapes:
+            print(f"shape : {shape}")
+
         return ModelUtils.create_observation_streams(
             visual_in,
-            vector_in,
+            shape,
             1,
             h_size,
             num_layers,
@@ -172,7 +175,7 @@ class NNPolicy(PTPolicy):
 
     def _create_cc_actor(
             self,
-            encoded: torch.Tensor,
+            encoded: torch.nn.ModuleList,
             tanh_squash: bool = False,
             reparameterize: bool = False,
             condition_sigma_on_obs: bool = True,
@@ -186,8 +189,7 @@ class NNPolicy(PTPolicy):
         :param reparameterize: Whether we are using the resampling trick to update the policy.
         """
 
-        modules = torch.nn.Sequential()
-
+        modules = torch.nn.ModuleList()
 
         if self.use_recurrent:
             self.memory_in = torch.placeholder(

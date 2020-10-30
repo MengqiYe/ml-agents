@@ -23,7 +23,7 @@ def basic_trainer_controller():
 
 @patch("numpy.random.seed")
 @patch.object(tf, "set_random_seed")
-def test_initialization_seed(numpy_random_seed, tensorflow_set_seed):
+def test_initialization_seed(numpy_random_seed, pytorch_set_seed):
     seed = 27
     trainer_factory_mock = MagicMock()
     trainer_factory_mock.ghost_controller = GhostController()
@@ -36,7 +36,7 @@ def test_initialization_seed(numpy_random_seed, tensorflow_set_seed):
         training_seed=seed,
     )
     numpy_random_seed.assert_called_with(seed)
-    tensorflow_set_seed.assert_called_with(seed)
+    pytorch_set_seed.assert_called_with(seed)
 
 
 @pytest.fixture

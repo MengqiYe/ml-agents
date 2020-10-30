@@ -64,11 +64,11 @@ setup(
         # "Pillow>=4.2.1",
         # "protobuf>=3.6",
         # "pyyaml>=3.1.0",
-        # "tensorflow-gpu>=1.7,<3.0",
+        # "pytorch-gpu>=1.7,<3.0",
         # "cattrs>=1.0.0",
         # "attrs>=19.3.0",
         # 'pypiwin32==223;platform_system=="Windows"',
-        # # We don't actually need six, but tensorflow does, and pip seems
+        # # We don't actually need six, but pytorch does, and pip seems
         # # to get confused and install the wrong version.
         # "six>=1.12.0",
     ],

@@ -325,7 +325,7 @@ class ModelUtils:
         #     for i in range(num_layers)
         # ]))
 
-        modules = torch.nn.Sequential()
+        modules = torch.nn.ModuleList()
         for i in range(num_layers):
             modules.add_module(f"{scope}/hidden_{i}", torch.nn.Linear(in_size, h_size))
             modules.add_module(f"{scope}/activation_{i}", Swish())
@@ -352,9 +352,7 @@ class ModelUtils:
         :param reuse: Whether to re-use the weights within the same scope.
         :return: List of hidden layer tensors.
         """
-        import torch
-
-        modules = torch.nn.Sequential()
+        modules = torch.nn.ModuleList()
 
         modules.add_module(f"{scope}/conv_1", torch.nn.Conv2D(3, 16, kernel_size=[8, 8], strides=[4, 4]))
         modules.add_module(f"{scope}/elu_1", torch.nn.ELU())
@@ -579,7 +577,7 @@ class ModelUtils:
     @staticmethod
     def create_observation_streams(
             visual_in: List[torch.Tensor],
-            vector_in: torch.Tensor,
+            vector_shape, # vector_in: torch.Tensor,
             num_streams: int,
             h_size: int,
             num_layers: int,
@@ -595,9 +593,7 @@ class ModelUtils:
             the scopes for each of the streams. None if all under the same PT scope.
         :return: List of encoded streams.
         """
-        in_size = vector_in.shape[1]
-
-        modules = torch.nn.Sequential()
+        modules = torch.nn.ModuleList()
         for i in range(num_streams):
             create_encoder_func = ModelUtils.get_encoder_for_type(vis_encode_type)
             visual_encoders = []
@@ -618,10 +614,10 @@ class ModelUtils:
 
                 hidden_visual = Route(visual_encoders, axis=1)
 
-            if vector_in.shape[-1] > 0:
+            if vector_shape > 0:
                 # Don't encode non-existant or 0-shape inputs
                 hidden_state = ModelUtils.create_vector_observation_encoder(
-                    in_size,
+                    vector_shape,
                     h_size,
                     Swish,
                     num_layers,

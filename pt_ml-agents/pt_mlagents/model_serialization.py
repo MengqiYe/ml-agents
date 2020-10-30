@@ -9,17 +9,17 @@ try:
 
     ONNX_EXPORT_ENABLED = True
 except ImportError:
-    # Either onnx and tf2onnx not installed, or they're not compatible with the version of tensorflow
+    # Either onnx and tf2onnx not installed, or they're not compatible with the version of pytorch
     ONNX_EXPORT_ENABLED = False
     pass
 
 from pt_mlagents.pt_utils import torch
 
-from tensorflow.python.platform import gfile
-from tensorflow.python.framework import graph_util
+# from torch.python.platform import gfile
+# from torch.python.framework import graph_util
 
 from pt_mlagents_envs.logging_util import get_logger
-from pt_mlagents.trainers import tensorflow_to_barracuda as tf2bc
+from pt_mlagents.trainers import pytorch_to_barracuda as tf2bc
 
 if LooseVersion(torch.__version__) < LooseVersion("1.12.0"):
     # ONNX is only tested on 1.12.0 and later
@@ -123,7 +123,7 @@ def _make_frozen_graph(
 def convert_frozen_to_onnx(
     settings: SerializationSettings, frozen_graph_def: None # torch.GraphDef
 ) -> Any:
-    # This is basically https://github.com/onnx/tensorflow-onnx/blob/master/tf2onnx/convert.py
+    # This is basically https://github.com/onnx/pytorch-onnx/blob/master/tf2onnx/convert.py
 
     inputs = _get_input_node_names(frozen_graph_def)
     outputs = _get_output_node_names(frozen_graph_def)

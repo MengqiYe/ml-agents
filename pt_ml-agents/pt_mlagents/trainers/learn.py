@@ -247,7 +247,7 @@ def run_cli(options: RunOptions) -> None:
         log_level = logging_util.DEBUG
     else:
         log_level = logging_util.INFO
-        # disable noisy warnings from tensorflow
+        # disable noisy warnings from pytorch
         pt_utils.set_warnings_enabled(False)
 
     logging_util.set_log_level(log_level)
