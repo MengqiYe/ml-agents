@@ -7,6 +7,7 @@ from pt_mlagents.pt_utils import torch
 import torch
 
 from pt_mlagents.trainers.exception import UnityTrainerException
+from functools import reduce
 
 ActivationFunction = Callable[[torch.Tensor], torch.Tensor]
 EncoderFunction = Callable[
@@ -175,10 +176,10 @@ class ModelUtils:
                 raise UnityTrainerException(
                     f"Unsupported shape of {dimension} for observation {i}"
                 )
-        vector_in = torch.placeholder(
-            shape=[None, vector_in_size],
-            dtype=torch.float32,
-            name=name_prefix + "vector_observation",
+        vector_in = torch.FloatTensor(
+            (vector_in_size),
+            # dtype=torch.float32,
+            # name=name_prefix + "vector_observation",
         )
         return vector_in, visual_in
 
@@ -325,9 +326,9 @@ class ModelUtils:
         #     for i in range(num_layers)
         # ]))
 
-        modules = torch.nn.ModuleList()
+        modules = torch.nn.Sequential()
         for i in range(num_layers):
-            modules.add_module(f"{scope}/hidden_{i}", torch.nn.Linear(in_size, h_size))
+            modules.add_module(f"{scope}/hidden_{i}", torch.nn.Linear(in_features=in_size, out_features=h_size))
             modules.add_module(f"{scope}/activation_{i}", Swish())
             in_size = h_size
 
@@ -593,7 +594,8 @@ class ModelUtils:
             the scopes for each of the streams. None if all under the same PT scope.
         :return: List of encoded streams.
         """
-        modules = torch.nn.ModuleList()
+        vector_size = reduce(lambda a, b : a * b, vector_shape)
+        modules = torch.nn.Sequential()
         for i in range(num_streams):
             create_encoder_func = ModelUtils.get_encoder_for_type(vis_encode_type)
             visual_encoders = []
@@ -614,10 +616,10 @@ class ModelUtils:
 
                 hidden_visual = Route(visual_encoders, axis=1)
 
-            if vector_shape > 0:
+            if vector_size > 0:
                 # Don't encode non-existant or 0-shape inputs
                 hidden_state = ModelUtils.create_vector_observation_encoder(
-                    vector_shape,
+                    vector_size,
                     h_size,
                     Swish,
                     num_layers,

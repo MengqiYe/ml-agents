@@ -141,14 +141,14 @@ class GaussianDistribution(OutputDistribution, torch.nn.ModuleList):
 
     def __init__(
             self,
-            logits: torch.Tensor,
+            # logits: torch.Tensor,
             act_size: List[int],
             reparameterize: bool = False,
             tanh_squash: bool = False,
             condition_sigma: bool = True,
             log_sigma_min: float = -20,
             log_sigma_max: float = 2,
-    ) -> torch.nn.Sequential:
+    ) -> torch.nn.Module:
         """
         A Gaussian output distribution for continuous actions.
         :param logits: Hidden layer to use as the input to the Gaussian distribution.

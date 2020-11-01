@@ -84,6 +84,7 @@ class NNPolicy(PTPolicy):
             # already populated, don't create more tensors.
             return
 
+        # FIXME : I think no input placeholder is needed for pytorch version.
         # self.create_input_placeholders()
         encoded = self._create_encoder(
             [],  # self.visual_in,
@@ -213,14 +214,12 @@ class NNPolicy(PTPolicy):
         )
         modules.add_module("gaussian_distribution", distribution)
 
-        if tanh_squash:
-            self.output_pre = distribution.sample
-            self.output = torch.identity(self.output_pre, name="action")
-        else:
+        if not tanh_squash:
             self.output_pre = distribution.sample
             # Clip and scale output to ensure actions are always within [-1, 1] range.
             output_post = torch.clamp(self.output_pre, -3, 3) / 3
             self.output = torch.Tensor(output_post, name="action")
+            modules.add_module("clamp", torch.nn.Module())
 
         self.selected_actions = self.output.detach()
 
