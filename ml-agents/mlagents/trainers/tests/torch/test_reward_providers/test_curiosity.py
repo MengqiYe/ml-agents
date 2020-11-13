@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 from mlagents.torch_utils import torch
-from mlagents.trainers.torch.components.reward_providers import (
+from mlagents.trainers.pt.components.reward_providers import (
     CuriosityRewardProvider,
     create_reward_provider,
 )
@@ -10,7 +10,7 @@ from mlagents.trainers.settings import CuriositySettings, RewardSignalType
 from mlagents.trainers.tests.torch.test_reward_providers.utils import (
     create_agent_buffer,
 )
-from mlagents.trainers.torch.utils import ModelUtils
+from mlagents.trainers.pt.utils import ModelUtils
 
 SEED = [42]
 

@@ -1,3 +1,10 @@
+import sys
+sys.path.extend([
+    '/home/mlagents/ml-agents_r8/gym-unity',
+    '/home/mlagents/ml-agents_r8/ml-agents',
+    '/home/mlagents/ml-agents_r8/ml-agents-envs',
+    '/home/mlagents/ml-agents_r8/tests'
+])
 # # Unity ML-Agents Toolkit
 import yaml
 
@@ -134,7 +141,7 @@ def run_training(run_seed: int, options: RunOptions) -> None:
             param_manager=env_parameter_manager,
             init_path=maybe_init_path,
             multi_gpu=False,
-            force_torch="torch" in DetectDefault.non_default_args,
+            force_torch="pt" in DetectDefault.non_default_args,
         )
         # Create controller and begin training.
         tc = TrainerController(

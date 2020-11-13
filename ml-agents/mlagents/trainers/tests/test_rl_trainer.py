@@ -123,7 +123,7 @@ def test_advance(mocked_clear_update_buffer, mocked_save_model):
 
 
 @pytest.mark.parametrize(
-    "framework", [FrameworkType.TENSORFLOW, FrameworkType.PYTORCH], ids=["tf", "torch"]
+    "framework", [FrameworkType.TENSORFLOW, FrameworkType.PYTORCH], ids=["tf", "pt"]
 )
 @mock.patch("mlagents.trainers.trainer.trainer.StatsReporter.write_stats")
 @mock.patch(

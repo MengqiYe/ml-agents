@@ -2,7 +2,7 @@ from typing import List, Optional, Tuple
 from mlagents.torch_utils import torch, nn
 import numpy as np
 
-from mlagents.trainers.torch.encoders import (
+from mlagents.trainers.pt.encoders import (
     SimpleVisualEncoder,
     ResNetVisualEncoder,
     NatureVisualEncoder,
@@ -12,7 +12,7 @@ from mlagents.trainers.torch.encoders import (
 from mlagents.trainers.settings import EncoderType, ScheduleType
 from mlagents.trainers.exception import UnityTrainerException
 from mlagents_envs.base_env import BehaviorSpec
-from mlagents.trainers.torch.distributions import DistInstance, DiscreteDistInstance
+from mlagents.trainers.pt.distributions import DistInstance, DiscreteDistInstance
 
 
 class ModelUtils:
@@ -51,7 +51,7 @@ class ModelUtils:
     @staticmethod
     def update_learning_rate(optim: torch.optim.Optimizer, lr: float) -> None:
         """
-        Apply a learning rate to a torch optimizer.
+        Apply a learning rate to a pt optimizer.
         :param optim: Optimizer
         :param lr: Learning rate
         """

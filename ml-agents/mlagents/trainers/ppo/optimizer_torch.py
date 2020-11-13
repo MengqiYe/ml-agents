@@ -7,7 +7,7 @@ from mlagents_envs.timers import timed
 from mlagents.trainers.policy.torch_policy import TorchPolicy
 from mlagents.trainers.optimizer.torch_optimizer import TorchOptimizer
 from mlagents.trainers.settings import TrainerSettings, PPOSettings
-from mlagents.trainers.torch.utils import ModelUtils
+from mlagents.trainers.pt.utils import ModelUtils
 
 
 class TorchPPOOptimizer(TorchOptimizer):

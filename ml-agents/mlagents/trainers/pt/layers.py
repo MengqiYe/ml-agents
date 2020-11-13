@@ -34,7 +34,7 @@ def linear_layer(
     bias_init: Initialization = Initialization.Zero,
 ) -> torch.nn.Module:
     """
-    Creates a torch.nn.Linear module and initializes its weights.
+    Creates a pt.nn.Linear module and initializes its weights.
     :param input_size: The size of the input tensor
     :param output_size: The size of the output tensor
     :param kernel_init: The Initialization to use for the weights of the layer
@@ -60,7 +60,7 @@ def lstm_layer(
     bias_init: Initialization = Initialization.Zero,
 ) -> torch.nn.Module:
     """
-    Creates a torch.nn.LSTM and initializes its weights and biases. Provides a
+    Creates a pt.nn.LSTM and initializes its weights and biases. Provides a
     forget_bias offset like is done in TensorFlow.
     """
     lstm = torch.nn.LSTM(input_size, hidden_size, num_layers, batch_first=batch_first)
@@ -174,7 +174,7 @@ class LSTM(MemoryModule):
     def forward(
         self, input_tensor: torch.Tensor, memories: torch.Tensor
     ) -> Tuple[torch.Tensor, torch.Tensor]:
-        # We don't use torch.split here since it is not supported by Barracuda
+        # We don't use pt.split here since it is not supported by Barracuda
         h0 = memories[:, :, : self.hidden_size]
         c0 = memories[:, :, self.hidden_size :]
         hidden = (h0, c0)

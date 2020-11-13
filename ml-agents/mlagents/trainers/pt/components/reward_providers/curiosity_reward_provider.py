@@ -3,15 +3,15 @@ from typing import Dict
 from mlagents.torch_utils import torch, default_device
 
 from mlagents.trainers.buffer import AgentBuffer
-from mlagents.trainers.torch.components.reward_providers.base_reward_provider import (
+from mlagents.trainers.pt.components.reward_providers.base_reward_provider import (
     BaseRewardProvider,
 )
 from mlagents.trainers.settings import CuriositySettings
 
 from mlagents_envs.base_env import BehaviorSpec
-from mlagents.trainers.torch.utils import ModelUtils
-from mlagents.trainers.torch.networks import NetworkBody
-from mlagents.trainers.torch.layers import LinearEncoder, linear_layer
+from mlagents.trainers.pt.utils import ModelUtils
+from mlagents.trainers.pt.networks import NetworkBody
+from mlagents.trainers.pt.layers import LinearEncoder, linear_layer
 from mlagents.trainers.settings import NetworkSettings, EncoderType
 
 

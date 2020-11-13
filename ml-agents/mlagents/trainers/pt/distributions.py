@@ -3,7 +3,7 @@ from typing import List
 from mlagents.torch_utils import torch, nn
 import numpy as np
 import math
-from mlagents.trainers.torch.layers import linear_layer, Initialization
+from mlagents.trainers.pt.layers import linear_layer, Initialization
 
 EPSILON = 1e-7  # Small value to avoid divide by zero
 
@@ -100,8 +100,8 @@ class CategoricalDistInstance(DiscreteDistInstance):
         return torch.multinomial(self.probs, 1)
 
     def pdf(self, value):
-        # This function is equivalent to torch.diag(self.probs.T[value.flatten().long()]),
-        # but torch.diag is not supported by ONNX export.
+        # This function is equivalent to pt.diag(self.probs.T[value.flatten().long()]),
+        # but pt.diag is not supported by ONNX export.
         idx = torch.arange(start=0, end=len(value)).unsqueeze(-1)
         return torch.gather(
             self.probs.permute(1, 0)[value.flatten().long()], -1, idx

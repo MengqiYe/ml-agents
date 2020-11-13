@@ -1,7 +1,7 @@
 import pytest
 
 from mlagents.torch_utils import torch
-from mlagents.trainers.torch.networks import (
+from mlagents.trainers.pt.networks import (
     NetworkBody,
     ValueNetwork,
     SimpleActor,
@@ -10,7 +10,7 @@ from mlagents.trainers.torch.networks import (
 )
 from mlagents.trainers.settings import NetworkSettings
 from mlagents_envs.base_env import ActionType
-from mlagents.trainers.torch.distributions import (
+from mlagents.trainers.pt.distributions import (
     GaussianDistInstance,
     CategoricalDistInstance,
 )

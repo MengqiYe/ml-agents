@@ -4,13 +4,13 @@ import numpy as np
 
 from mlagents.trainers.buffer import AgentBuffer
 from mlagents.trainers.trajectory import SplitObservations
-from mlagents.trainers.torch.components.bc.module import BCModule
-from mlagents.trainers.torch.components.reward_providers import create_reward_provider
+from mlagents.trainers.pt.components.bc.module import BCModule
+from mlagents.trainers.pt.components.reward_providers import create_reward_provider
 
 from mlagents.trainers.policy.torch_policy import TorchPolicy
 from mlagents.trainers.optimizer import Optimizer
 from mlagents.trainers.settings import TrainerSettings
-from mlagents.trainers.torch.utils import ModelUtils
+from mlagents.trainers.pt.utils import ModelUtils
 
 
 class TorchOptimizer(Optimizer):  # pylint: disable=W0223

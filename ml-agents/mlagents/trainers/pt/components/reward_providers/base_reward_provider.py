@@ -74,7 +74,7 @@ class BaseRewardProvider(ABC):
 
     def get_modules(self) -> Dict[str, torch.nn.Module]:
         """
-        Returns a dictionary of string identifiers to the torch.nn.Modules used by
+        Returns a dictionary of string identifiers to the pt.nn.Modules used by
         the reward providers. This method is used for loading and saving the weights
         of the reward providers.
         """

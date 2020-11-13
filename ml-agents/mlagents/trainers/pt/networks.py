@@ -4,16 +4,16 @@ import abc
 from mlagents.torch_utils import torch, nn
 
 from mlagents_envs.base_env import ActionType
-from mlagents.trainers.torch.distributions import (
+from mlagents.trainers.pt.distributions import (
     GaussianDistribution,
     MultiCategoricalDistribution,
     DistInstance,
 )
 from mlagents.trainers.settings import NetworkSettings
-from mlagents.trainers.torch.utils import ModelUtils
-from mlagents.trainers.torch.decoders import ValueHeads
-from mlagents.trainers.torch.layers import LSTM, LinearEncoder
-from mlagents.trainers.torch.model_serialization import exporting_to_onnx
+from mlagents.trainers.pt.utils import ModelUtils
+from mlagents.trainers.pt.decoders import ValueHeads
+from mlagents.trainers.pt.layers import LSTM, LinearEncoder
+from mlagents.trainers.pt.model_serialization import exporting_to_onnx
 
 ActivationFunction = Callable[[torch.Tensor], torch.Tensor]
 EncoderFunction = Callable[

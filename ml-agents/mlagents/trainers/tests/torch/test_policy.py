@@ -4,7 +4,7 @@ from mlagents.torch_utils import torch
 from mlagents.trainers.policy.torch_policy import TorchPolicy
 from mlagents.trainers.tests import mock_brain as mb
 from mlagents.trainers.settings import TrainerSettings, NetworkSettings
-from mlagents.trainers.torch.utils import ModelUtils
+from mlagents.trainers.pt.utils import ModelUtils
 
 VECTOR_ACTION_SPACE = 2
 VECTOR_OBS_SPACE = 8

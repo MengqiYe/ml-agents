@@ -3,10 +3,10 @@ from mlagents.torch_utils import torch
 import numpy as np
 
 from mlagents.trainers.settings import EncoderType, ScheduleType
-from mlagents.trainers.torch.utils import ModelUtils
+from mlagents.trainers.pt.utils import ModelUtils
 from mlagents.trainers.exception import UnityTrainerException
-from mlagents.trainers.torch.encoders import VectorInput
-from mlagents.trainers.torch.distributions import (
+from mlagents.trainers.pt.encoders import VectorInput
+from mlagents.trainers.pt.distributions import (
     CategoricalDistInstance,
     GaussianDistInstance,
 )
@@ -103,19 +103,19 @@ def test_list_to_tensor():
     # Test converting pure list
     unconverted_list = [[1, 2], [1, 3], [1, 4]]
     tensor = ModelUtils.list_to_tensor(unconverted_list)
-    # Should be equivalent to torch.tensor conversion
+    # Should be equivalent to pt.tensor conversion
     assert torch.equal(tensor, torch.tensor(unconverted_list))
 
     # Test converting pure numpy array
     np_list = np.asarray(unconverted_list)
     tensor = ModelUtils.list_to_tensor(np_list)
-    # Should be equivalent to torch.tensor conversion
+    # Should be equivalent to pt.tensor conversion
     assert torch.equal(tensor, torch.tensor(unconverted_list))
 
     # Test converting list of numpy arrays
     list_of_np = [np.asarray(_el) for _el in unconverted_list]
     tensor = ModelUtils.list_to_tensor(list_of_np)
-    # Should be equivalent to torch.tensor conversion
+    # Should be equivalent to pt.tensor conversion
     assert torch.equal(tensor, torch.tensor(unconverted_list))
 
 

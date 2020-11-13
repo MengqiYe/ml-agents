@@ -7,8 +7,8 @@ from mlagents_envs.base_env import ActionType
 from mlagents.trainers.optimizer.torch_optimizer import TorchOptimizer
 from mlagents.trainers.policy.torch_policy import TorchPolicy
 from mlagents.trainers.settings import NetworkSettings
-from mlagents.trainers.torch.networks import ValueNetwork
-from mlagents.trainers.torch.utils import ModelUtils
+from mlagents.trainers.pt.networks import ValueNetwork
+from mlagents.trainers.pt.utils import ModelUtils
 from mlagents.trainers.buffer import AgentBuffer
 from mlagents_envs.timers import timed
 from mlagents.trainers.exception import UnityTrainerException
@@ -76,7 +76,7 @@ class TorchSACOptimizer(TorchOptimizer):
             :return: Tuple of two dictionaries, which both map {reward_signal: Q} for Q1 and Q2,
                 respectively.
             """
-            # ExitStack allows us to enter the torch.no_grad() context conditionally
+            # ExitStack allows us to enter the pt.no_grad() context conditionally
             with ExitStack() as stack:
                 if not q1_grad:
                     stack.enter_context(torch.no_grad())

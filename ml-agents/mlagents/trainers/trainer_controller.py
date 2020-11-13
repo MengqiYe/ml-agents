@@ -156,6 +156,7 @@ class TrainerController:
         # Only start new trainers
         if trainerthread is not None:
             trainerthread.start()
+            print(f"trainerthread : {trainerthread.native_id}")
 
     def _create_trainers_and_managers(
         self, env_manager: EnvManager, behavior_ids: Set[str]

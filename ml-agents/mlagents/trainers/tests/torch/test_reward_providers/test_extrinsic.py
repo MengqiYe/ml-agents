@@ -1,5 +1,5 @@
 import pytest
-from mlagents.trainers.torch.components.reward_providers import (
+from mlagents.trainers.pt.components.reward_providers import (
     ExtrinsicRewardProvider,
     create_reward_provider,
 )

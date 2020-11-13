@@ -1,6 +1,6 @@
 from typing import Tuple, Optional, Union
 
-from mlagents.trainers.torch.layers import linear_layer, Initialization, Swish
+from mlagents.trainers.pt.layers import linear_layer, Initialization, Swish
 
 from mlagents.torch_utils import torch, nn
 
@@ -53,7 +53,7 @@ def conv_output_shape(
     """
     Calculates the output shape (height and width) of the output of a convolution layer.
     kernel_size, stride, padding and dilation correspond to the inputs of the
-    torch.nn.Conv2d layer (https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html)
+    pt.nn.Conv2d layer (https://pytorch.org/docs/stable/generated/torch.nn.Conv2d.html)
     :param h_w: The height and width of the input.
     :param kernel_size: The size of the kernel of the convolution (can be an int or a
     tuple [width, height])
@@ -78,7 +78,7 @@ def pool_out_shape(h_w: Tuple[int, int], kernel_size: int) -> Tuple[int, int]:
     """
     Calculates the output shape (height and width) of the output of a max pooling layer.
     kernel_size corresponds to the inputs of the
-    torch.nn.MaxPool2d layer (https://pytorch.org/docs/stable/generated/torch.nn.MaxPool2d.html)
+    pt.nn.MaxPool2d layer (https://pytorch.org/docs/stable/generated/torch.nn.MaxPool2d.html)
     :param kernel_size: The size of the kernel of the convolution
     """
     height = (h_w[0] - kernel_size) // 2 + 1

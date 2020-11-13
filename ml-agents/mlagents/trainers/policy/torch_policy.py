@@ -11,12 +11,12 @@ from mlagents_envs.timers import timed
 
 from mlagents.trainers.settings import TrainerSettings
 from mlagents.trainers.trajectory import SplitObservations
-from mlagents.trainers.torch.networks import (
+from mlagents.trainers.pt.networks import (
     SharedActorCritic,
     SeparateActorCritic,
     GlobalSteps,
 )
-from mlagents.trainers.torch.utils import ModelUtils
+from mlagents.trainers.pt.utils import ModelUtils
 
 EPSILON = 1e-7  # Small value to avoid divide by zero
 

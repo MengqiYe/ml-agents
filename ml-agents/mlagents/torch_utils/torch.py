@@ -2,10 +2,10 @@ import os
 
 from mlagents.torch_utils import cpu_utils
 
-# Detect availability of torch package here.
-# NOTE: this try/except is temporary until torch is required for ML-Agents.
+# Detect availability of pt package here.
+# NOTE: this try/except is temporary until pt is required for ML-Agents.
 try:
-    # This should be the only place that we import torch directly.
+    # This should be the only place that we import pt directly.
     # Everywhere else is caught by the banned-modules setting for flake8
     import torch  # noqa I201
 

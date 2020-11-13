@@ -4,7 +4,7 @@ import pytest
 from unittest.mock import patch
 from mlagents.torch_utils import torch
 import os
-from mlagents.trainers.torch.components.reward_providers import (
+from mlagents.trainers.pt.components.reward_providers import (
     GAILRewardProvider,
     create_reward_provider,
 )
@@ -13,7 +13,7 @@ from mlagents.trainers.settings import GAILSettings, RewardSignalType
 from mlagents.trainers.tests.torch.test_reward_providers.utils import (
     create_agent_buffer,
 )
-from mlagents.trainers.torch.components.reward_providers.gail_reward_provider import (
+from mlagents.trainers.pt.components.reward_providers.gail_reward_provider import (
     DiscriminatorNetwork,
 )
 
@@ -59,7 +59,7 @@ def test_factory(behavior_spec: BehaviorSpec) -> None:
 )
 @pytest.mark.parametrize("use_actions", [False, True])
 @patch(
-    "mlagents.trainers.torch.components.reward_providers.gail_reward_provider.demo_to_buffer"
+    "mlagents.trainers.pt.components.reward_providers.gail_reward_provider.demo_to_buffer"
 )
 def test_reward_decreases(
     demo_to_buffer: Any, use_actions: bool, behavior_spec: BehaviorSpec, seed: int
@@ -107,7 +107,7 @@ def test_reward_decreases(
 )
 @pytest.mark.parametrize("use_actions", [False, True])
 @patch(
-    "mlagents.trainers.torch.components.reward_providers.gail_reward_provider.demo_to_buffer"
+    "mlagents.trainers.pt.components.reward_providers.gail_reward_provider.demo_to_buffer"
 )
 def test_reward_decreases_vail(
     demo_to_buffer: Any, use_actions: bool, behavior_spec: BehaviorSpec, seed: int
